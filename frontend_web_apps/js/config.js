@@ -4,8 +4,12 @@
 export const PORTAL_CONFIG = {
     APP_NAME: "MediKiosk Clinical Portals",
     HOSPITAL_NAME: "All India Institute of Ayurveda & Associated Hospitals",
-    API_BASE: "http://localhost:8000/api/v1",
-    WS_TRIAGE: "ws://localhost:8000/api/v1/triage/ws",
+    API_BASE: window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:8000/api/v1"
+        : "https://medikiosk-backend-ddbm.onrender.com/api/v1",
+    WS_TRIAGE: window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "ws://localhost:8000/api/v1/triage/ws"
+        : "wss://medikiosk-backend-ddbm.onrender.com/api/v1/triage/ws",
     
     // Default Mock Active Session Credentials (for Demonstration)
     DEFAULT_DOCTOR_ID: "DOC-2026-01",     // Dr. Rajesh Sharma (Gen Med / Kayachikitsa)

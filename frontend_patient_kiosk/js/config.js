@@ -4,8 +4,12 @@
 export const CONFIG = {
     APP_NAME: "MediKiosk",
     HOSPITAL_NAME: "All India Institute of Ayurveda & Associated Hospitals",
-    API_BASE_URL: "http://localhost:8000/api/v1",
-    WS_TRIAGE_URL: "ws://localhost:8000/api/v1/triage/ws",
+    API_BASE_URL: window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+        ? "http://localhost:8000/api/v1" 
+        : "https://medikiosk-backend-ddbm.onrender.com/api/v1",
+    WS_TRIAGE_URL: window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "ws://localhost:8000/api/v1/triage/ws"
+        : "wss://medikiosk-backend-ddbm.onrender.com/api/v1/triage/ws",
     
     // Inactivity Timers (in milliseconds)
     INACTIVITY_WARN_MS: 150000,    // 2.5 Minutes

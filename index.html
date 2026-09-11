@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediKiosk — Multimodal Clinical Intake Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .gateway-card {
+            width: 100%;
+            max-width: 860px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+            text-align: center;
+        }
+        .gateway-header {
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+            padding: 36px 28px;
+            color: #ffffff;
+        }
+        .gateway-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .gateway-header p {
+            font-size: 15px;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+        .portal-grid {
+            padding: 36px 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .portal-btn {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-decoration: none;
+            color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 200ms ease;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+        .portal-btn:hover {
+            border-color: #0d9488;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(13, 148, 136, 0.12);
+        }
+        .portal-btn h3 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .portal-btn p {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.5;
+        }
+        .portal-icon {
+            font-size: 40px;
+        }
+        .portal-badge {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            color: #0d9488;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+        @media (max-width: 680px) {
+            .portal-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="gateway-card">
+        <div class="gateway-header">
+            <div style="font-size: 44px; margin-bottom: 8px;">🏥</div>
+            <h1>MediKiosk Clinical Platform</h1>
+            <p>All India Institute of Ayurveda (AIIA) & Associated Hospital Network</p>
+        </div>
+
+        <div class="portal-grid">
+            <!-- Patient Kiosk Link -->
+            <a href="./frontend_patient_kiosk/" class="portal-btn">
+                <span class="portal-icon">📱</span>
+                <span class="portal-badge">8 Languages • Touch & Voice</span>
+                <h3>Patient Intake Kiosk</h3>
+                <p>Multilingual pre-OPD case-taking, spoken voice quiz, body map, and digital token slip generation.</p>
+                <div style="font-weight: 800; color: #0d9488; margin-top: 6px;">Launch Patient Kiosk ➔</div>
+            </a>
+
+            <!-- Doctor Console Link -->
+            <a href="./frontend_web_apps/" class="portal-btn">
+                <span class="portal-icon">🩺</span>
+                <span class="portal-badge">Physician Console</span>
+                <h3>Doctor Clinical Console</h3>
+                <p>Assigned OPD worklist, QR/PIN medical record unlock, live consultation timer, and summary sign-off.</p>
+                <div style="font-weight: 800; color: #0d9488; margin-top: 6px;">Launch Doctor Portal ➔</div>
+            </a>
+        </div>
+
+        <div style="padding: 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+            Live Backend: <strong style="color: #059669;">https://medikiosk-backend-ddbm.onrender.com</strong> • Connected & Active
+        </div>
+    </div>
+</body>
+</html>
