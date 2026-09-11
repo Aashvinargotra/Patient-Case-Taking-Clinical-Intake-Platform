@@ -1,0 +1,198 @@
+/* ==========================================================================
+   MediKiosk Fullscreen Kiosk Layout & Status Bars
+   ========================================================================== */
+
+.kiosk-app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0b1120 100%);
+}
+
+/* Header Bar */
+.kiosk-header {
+  height: 100px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.kiosk-branding {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.kiosk-logo-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary-teal), var(--ayush-saffron));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 14px var(--primary-teal-glow);
+}
+
+.kiosk-title-group h1 {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.kiosk-title-group p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.kiosk-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-btn {
+  height: var(--tap-target-min);
+  padding: 0 20px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.header-btn:hover, .header-btn:active {
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+}
+
+.header-btn.active {
+  background: var(--primary-teal);
+  color: #ffffff;
+  border-color: var(--primary-teal-light);
+  box-shadow: 0 0 16px var(--primary-teal-glow);
+}
+
+.clock-badge {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Main Viewport Content */
+.kiosk-viewport {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 48px;
+}
+
+/* Bottom Accessibility Bar */
+.kiosk-footer-accessibility {
+  height: 96px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 50;
+}
+
+.access-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.access-btn {
+  height: var(--tap-target-min);
+  padding: 0 24px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.access-btn:active {
+  transform: scale(0.96);
+}
+
+.access-btn.emergency-btn {
+  background: linear-gradient(135deg, var(--emergency-red), var(--emergency-red-dark));
+  border-color: #fca5a5;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+}
+
+/* Fullscreen Modals */
+.kiosk-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.kiosk-modal-card {
+  width: 90%;
+  max-width: 680px;
+  background: var(--bg-surface);
+  border: 2px solid var(--primary-teal);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  animation: modal-pop 300ms var(--transition-bounce);
+}
+
+@keyframes modal-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

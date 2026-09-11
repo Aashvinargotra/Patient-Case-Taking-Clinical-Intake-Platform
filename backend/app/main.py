@@ -39,6 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+from fastapi.staticfiles import StaticFiles
+
 # Mount API V1 Routers
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(intake_router, prefix=settings.API_V1_STR)
@@ -48,6 +51,18 @@ app.include_router(triage_router, prefix=settings.API_V1_STR)
 app.include_router(documents_router, prefix=settings.API_V1_STR)
 app.include_router(patient_portal_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
+
+# Mount Static Kiosk Frontend if directory exists
+kiosk_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend_patient_kiosk"))
+if os.path.exists(kiosk_dir):
+    app.mount("/kiosk", StaticFiles(directory=kiosk_dir, html=True), name="kiosk")
+
+# Mount Static Clinical Web Portals Suite if directory exists
+portal_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend_web_apps"))
+if os.path.exists(portal_dir):
+    app.mount("/portal", StaticFiles(directory=portal_dir, html=True), name="portal")
+
+
 
 @app.get("/health", tags=["System Health"])
 async def health_check():

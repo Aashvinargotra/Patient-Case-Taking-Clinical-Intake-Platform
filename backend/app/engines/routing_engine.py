@@ -27,7 +27,7 @@ def determine_department(chief_complaint: str, discipline: str = "ALLOPATHY", is
     if is_emergency:
         return DEPARTMENT_MAP["EMERGENCY"]
 
-    text = chief_complaint.lower()
+    text = chief_complaint.lower().replace("_", " ")
 
     if discipline.upper() == "AYUSH":
         if any(k in text for k in ["joint", "sandhi", "amavata", "pain", "vata"]):
