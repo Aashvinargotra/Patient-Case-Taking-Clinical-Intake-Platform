@@ -26,6 +26,9 @@ build/
 # Database & Cache Persistence
 pgdata/
 redis_data/
+*.db
+*.sqlite
+*.sqlite3
 
 # Uploaded Files & Temporary Assets
 uploads/

@@ -103,6 +103,18 @@ INITIAL_STAFF = [
 # 4. Default Demonstration Patients
 INITIAL_PATIENTS = [
     {
+        "patient_id": "PAT-DEMO-01",
+        "full_name": "Aarav Sharma",
+        "gender": "MALE",
+        "birth_year": 1988,
+        "is_temporary": False,
+        "phone_search_hash": compute_search_hash("+919876543200"),
+        "phone_encrypted": encrypt_phone("+919876543200"),
+        "password_hash": hash_password("PatientPass2026!"),
+        "mpin_hash": hash_password("1234"),
+        "abha_address": "aarav.sharma@abdm"
+    },
+    {
         "patient_id": "PAT-1001",
         "full_name": "Ramesh Kumar",
         "gender": "MALE",

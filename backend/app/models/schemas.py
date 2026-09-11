@@ -11,8 +11,12 @@ from sqlalchemy import (
     Numeric,
     ForeignKey,
     Index,
+    JSON,
 )
 from sqlalchemy.dialects.postgresql import JSONB
+
+# Dialect-agnostic JSON type supporting both Postgres JSONB and SQLite JSON
+JSON_TYPE = JSON().with_variant(JSONB, "postgresql")
 
 metadata = MetaData()
 
@@ -125,7 +129,7 @@ dpdp_data_requests = Table(
     Column("status", String(32), nullable=False, default="PENDING"), # PENDING, APPROVED, COMPLETED, REJECTED
     Column("requested_at", DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)),
     Column("completed_at", DateTime(timezone=True), nullable=True),
-    Column("payload", JSONB, nullable=True),
+    Column("payload", JSON_TYPE, nullable=True),
 )
 
 # 8. Clinical Summaries Table
@@ -136,8 +140,8 @@ clinical_summaries = Table(
     Column("session_id", String(36), ForeignKey("visit_sessions.session_id"), nullable=False),
     Column("patient_id", String(32), ForeignKey("patients.patient_id"), nullable=False),
     Column("chief_complaint", Text, nullable=False),
-    Column("structured_history", JSONB, nullable=False), # SOCRATES or AYUSH Pariksha
-    Column("extracted_investigations", JSONB, nullable=True),
+    Column("structured_history", JSON_TYPE, nullable=False), # SOCRATES or AYUSH Pariksha
+    Column("extracted_investigations", JSON_TYPE, nullable=True),
     Column("draft_summary_text", Text, nullable=False),
     Column("doctor_notes", Text, nullable=True),
     Column("is_draft", Boolean, nullable=False, default=True),
@@ -179,7 +183,7 @@ extracted_entities = Table(
     Column("reference_range_high", Numeric(10, 2), nullable=True),
     Column("is_abnormal", Boolean, nullable=False, default=False),
     Column("confidence_score", Numeric(4, 3), nullable=False, default=1.0),
-    Column("bbox_coordinates", JSONB, nullable=True),
+    Column("bbox_coordinates", JSON_TYPE, nullable=True),
 )
 
 # 11. Token Records Table
@@ -209,7 +213,7 @@ triage_alerts = Table(
     Column("patient_id", String(32), ForeignKey("patients.patient_id"), nullable=False),
     Column("severity_tier", String(16), nullable=False), # RED, AMBER
     Column("trigger_rule", String(128), nullable=False),
-    Column("trigger_slots", JSONB, nullable=False),
+    Column("trigger_slots", JSON_TYPE, nullable=False),
     Column("status", String(32), nullable=False, default="ACTIVE"), # ACTIVE, ACKNOWLEDGED, RESOLVED
     Column("resolved_by_staff_id", String(32), ForeignKey("staff_users.staff_id"), nullable=True),
     Column("resolved_at", DateTime(timezone=True), nullable=True),
@@ -226,7 +230,7 @@ audit_logs = Table(
     Column("user_role", String(32), nullable=False),
     Column("target_patient_id", String(32), nullable=True),
     Column("ip_address", String(64), nullable=True),
-    Column("action_details", JSONB, nullable=True),
+    Column("action_details", JSON_TYPE, nullable=True),
     Column("status", String(32), nullable=False, default="SUCCESS"),
     Column("timestamp", DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)),
     Index("idx_audit_logs_event", "event_type", "timestamp"),
