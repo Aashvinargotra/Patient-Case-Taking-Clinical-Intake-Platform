@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, or_
+from sqlalchemy import select, update, or_, case
 
 from app.db.session import get_db
 from app.models.schemas import (
@@ -28,54 +28,59 @@ class DoctorLoginRequest(BaseModel):
 
 class VerifyPatientTokenRequest(BaseModel):
     doctor_id: str
-    token_id: Optional[str] = None
     patient_id: Optional[str] = None
+    token_id: Optional[str] = None
     token_number: Optional[int] = None
-    token_pin: Optional[str] = None
+    pin: Optional[str] = None
     qr_data: Optional[str] = None
 
-class SignSummaryRequest(BaseModel):
+class ClinicalSignoffRequest(BaseModel):
     doctor_id: str
-    doctor_notes: Optional[str] = None
-    amended_summary_text: Optional[str] = None
-    consultation_duration_seconds: Optional[int] = None
+    session_id: str
+    patient_id: str
+    diagnosis_icd10: Optional[str] = None
+    diagnosis_namaste: Optional[str] = None
+    prescriptions: List[Dict[str, Any]] = []
+    clinical_notes: str
+    follow_up_days: Optional[int] = 7
+
+class DoctorProfileUpdateRequest(BaseModel):
+    doctor_id: str
+    is_on_duty: bool
 
 @router.post("/login")
 async def doctor_login(req: DoctorLoginRequest, db: AsyncSession = Depends(get_db)):
     """
-    Authenticates an attending physician and returns profile & assigned department.
+    Direct physician login for OPD Cabin console.
     """
-    q = select(doctors, departments.c.name.label("department_name"), departments.c.floor_room)\
-        .outerjoin(departments, doctors.c.department_id == departments.c.department_id)\
-        .where(
-            or_(
-                doctors.c.doctor_id == req.doctor_id,
-                doctors.c.medical_registration_number == req.doctor_id
-            )
-        )
-    doc = (await db.execute(q)).fetchone()
+    doc = (await db.execute(select(doctors).where(doctors.c.doctor_id == req.doctor_id))).fetchone()
     if not doc:
-        # Check if fallback doctor demo
-        return {
-            "doctor_id": req.doctor_id,
-            "full_name": "Dr. Ananya Sharma",
-            "department_id": "KAYACHIKITSA",
-            "department_name": "Kayachikitsa (Ayurvedic Internal Medicine)",
-            "floor_room": "Room A-101",
-            "medical_registration_number": "AYUSH-99214-ND",
-            "is_on_duty": True,
-            "token": f"jwt-doc-{req.doctor_id}-authenticated"
-        }
+        # Check if demo doctor
+        if req.doctor_id in ["DOC-AYUSH-01", "DOC-CARDIO-01", "DOC-ORTHO-01"]:
+            dept = "KAYACHIKITSA" if "AYUSH" in req.doctor_id else ("CARDIOLOGY" if "CARDIO" in req.doctor_id else "ORTHOPEDICS")
+            name = "Dr. Ananya Sharma" if "AYUSH" in req.doctor_id else "Dr. Vikram Malhotra"
+            room = "Room A-101" if "AYUSH" in req.doctor_id else "Room 104"
+            return {
+                "doctor_id": req.doctor_id,
+                "full_name": name,
+                "department_id": dept,
+                "department_name": dept,
+                "assigned_room": room,
+                "is_on_duty": True
+            }
+        raise HTTPException(status_code=404, detail="Doctor ID not registered")
+
+    dept_row = (await db.execute(select(departments).where(departments.c.department_id == doc.department_id))).fetchone()
+    dept_name = dept_row.name if dept_row else doc.department_id
+    room = dept_row.floor_room if dept_row else "Room 101"
 
     return {
         "doctor_id": doc.doctor_id,
         "full_name": doc.full_name,
         "department_id": doc.department_id,
-        "department_name": doc.department_name or "General OPD",
-        "floor_room": doc.floor_room or "Room 101",
-        "medical_registration_number": doc.medical_registration_number,
-        "is_on_duty": doc.is_on_duty,
-        "token": f"jwt-doc-{doc.doctor_id}-authenticated"
+        "department_name": dept_name,
+        "assigned_room": room,
+        "is_on_duty": doc.is_on_duty
     }
 
 @router.get("/opd-queue")
@@ -104,12 +109,15 @@ async def get_doctor_opd_queue(department_id: Optional[str] = None, doctor_id: O
      .outerjoin(clinical_summaries, token_records.c.session_id == clinical_summaries.c.session_id)\
      .where(token_records.c.queue_status.in_(["WAITING", "CALLED"]))
 
-    if department_id:
+    if department_id and department_id != "ALL":
         q = q.where(token_records.c.department_id == department_id)
 
     q = q.order_by(
-        token_records.c.priority_tier == "RED",
-        token_records.c.priority_tier == "AMBER",
+        case(
+            (token_records.c.priority_tier == "RED", 1),
+            (token_records.c.priority_tier == "AMBER", 2),
+            else_=3
+        ).asc(),
         token_records.c.token_number.asc()
     )
 
