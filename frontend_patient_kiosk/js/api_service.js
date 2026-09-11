@@ -111,6 +111,28 @@ class ApiService {
     }
 
     /**
+     * Retrieves all active linked network hospitals
+     */
+    async getLinkedHospitals() {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/intake/hospitals`);
+            if (resp.ok) {
+                return await resp.json();
+            }
+        } catch (err) {
+            console.warn("[ApiService.getLinkedHospitals] Offline fallback:", err);
+        }
+        return [
+            { hospital_id: "HOSP-AIIA-ND", name: "All India Institute of Ayurveda (AIIA), New Delhi", badge: "Apex AYUSH Institute • MoA", city: "New Delhi" },
+            { hospital_id: "HOSP-AIIMS-ND", name: "All India Institute of Medical Sciences (AIIMS), New Delhi", badge: "Apex Medical Center • MoHFW", city: "New Delhi" },
+            { hospital_id: "HOSP-SAF-ND", name: "Safdarjung Hospital & VMMC, New Delhi", badge: "Central Govt Multi-Speciality", city: "New Delhi" },
+            { hospital_id: "HOSP-RML-ND", name: "Dr. Ram Manohar Lohia Hospital, New Delhi", badge: "Central Govt Hospital", city: "New Delhi" },
+            { hospital_id: "HOSP-NIA-JP", name: "National Institute of Ayurveda (NIA), Jaipur", badge: "National Institute", city: "Jaipur" },
+            { hospital_id: "HOSP-ITRA-GJ", name: "Institute of Teaching and Research in Ayurveda (ITRA), Jamnagar", badge: "Institute of National Importance", city: "Jamnagar" }
+        ];
+    }
+
+    /**
      * Finalizes clinical intake session: creates draft summary and generates signed QR token
      */
     async finalizeSession(sessionData) {

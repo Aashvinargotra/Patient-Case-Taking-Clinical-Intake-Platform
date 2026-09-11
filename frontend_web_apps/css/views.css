@@ -1,98 +1,146 @@
 /* ==========================================================================
-   MediKiosk Web Portals Specific View Styles (Hospital Light Theme)
+   MediKiosk Web Portals Specific View Styles (Hospital High-Contrast Theme)
    ========================================================================== */
 
-/* Split-Screen Crop Verification Viewer */
-.split-viewer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  height: calc(100vh - 140px);
+/* Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  border: 1px solid transparent;
+  text-decoration: none;
 }
 
-.split-pane {
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0f766e;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0f766e;
+}
+
+.btn-success {
+  background: #059669;
+  color: #ffffff;
+  border-color: #047857;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #047857;
+}
+
+.btn-outline {
   background: #ffffff;
-  border: 1px solid var(--portal-border);
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* Badge System */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.badge-green {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-red {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.badge-amber {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+/* Card Elements */
+.clinical-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
   border-radius: var(--radius-md);
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
-.pane-header {
+.clinical-card-header {
   font-size: 16px;
-  font-weight: 700;
-  color: var(--portal-text-main);
-  margin-bottom: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--portal-border);
+  border-bottom: 1.5px solid #f1f5f9;
   padding-bottom: 12px;
 }
 
-/* Crop Image Box */
-.crop-preview-box {
-  background: #f1f5f9;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--portal-border);
-  overflow: hidden;
-  position: relative;
-  min-height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.crop-preview-img {
-  max-width: 100%;
-  max-height: 260px;
-  object-fit: contain;
-}
-
-.ocr-confidence-tag {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(13, 148, 136, 0.95);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-/* Clinical Summary Editor */
-.summary-editor-textarea {
+/* Clinical Summary Preformatted Box */
+.summary-pre-box {
   width: 100%;
-  height: 240px;
   background: #f8fafc;
-  border: 1px solid var(--portal-border);
+  border: 1.5px solid #cbd5e1;
   border-radius: var(--radius-sm);
-  color: var(--portal-text-main);
+  color: #0f172a;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13.5px;
+  line-height: 1.7;
   padding: 16px;
-  resize: vertical;
-  margin-bottom: 16px;
+  white-space: pre-wrap;
 }
 
-/* TV Queue Board Display */
-.tv-display-container {
+/* Form Controls */
+.form-input {
+  width: 100%;
   background: #ffffff;
-  border: 2px solid var(--portal-border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  box-shadow: var(--shadow-elevated);
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 150ms ease;
 }
 
-.tv-serving-token {
-  font-size: 72px;
-  font-weight: 900;
-  color: var(--portal-primary-hover);
-  letter-spacing: -2px;
+.form-input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
 }

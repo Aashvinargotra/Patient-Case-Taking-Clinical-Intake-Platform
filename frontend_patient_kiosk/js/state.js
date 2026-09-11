@@ -19,9 +19,9 @@ class KioskStateStore {
             abhaAddress: "",
             authType: null,
             
-            // Intake Configurations
+            // Intake Configurations - English as Default
             discipline: null,         // 'ALLOPATHY' | 'AYUSH'
-            language: "hi",           // Default Hindi
+            language: "en",           // Default English
             intakeMode: "VOICE",      // 'VOICE' | 'TOUCH'
             currentStepIndex: 0,
             
@@ -36,16 +36,16 @@ class KioskStateStore {
             tokenNumber: null,
             signedQrData: null,
             
-            // Accessibility Toggles
+            // Accessibility Toggles & Text Size Scale
+            fontScale: 1.0,           // 0.85, 1.0, 1.15, 1.30
             highContrastMode: false,
-            largeTextMode: false,
             slowSpeechMode: false,
             audioMuted: false,
             isRecording: false,
             isSpeaking: false,
             
             // Screen Navigation
-            currentScreen: "HOME",    // HOME, AUTH, DISCIPLINE, INTAKE, BODY_MAP, DOC_SCAN, CONFIRMATION, TOKEN_SLIP
+            currentScreen: "AUTH",    // AUTH, DISCIPLINE, BODY_MAP, VOICE_INTAKE, DOC_SCANNER, COMPLETION_HOSPITAL, SLIP_SUMMARY
             
             // Inactivity Paused
             isPaused: false

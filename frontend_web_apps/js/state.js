@@ -7,10 +7,13 @@ class PortalStateStore {
     constructor() {
         this.listeners = new Set();
         this.state = {
+            isLoggedIn: false,
             currentRole: "DOCTOR",              // DOCTOR, TRIAGE, ADMIN, PUBLIC_BOARD, PATIENT
             activeDepartment: "KAYACHIKITSA",
-            activeDoctorId: PORTAL_CONFIG.DEFAULT_DOCTOR_ID,
-            activeDoctorName: PORTAL_CONFIG.DEFAULT_DOCTOR_NAME,
+            activeDepartmentName: "Kayachikitsa (Ayurvedic Medicine)",
+            activeRoom: "Room A-101 (Ground Floor)",
+            activeDoctorId: "DOC-AYUSH-01",
+            activeDoctorName: "Dr. Ananya Sharma",
             activeStaffId: PORTAL_CONFIG.DEFAULT_STAFF_ID,
             
             // Doctor Case Context

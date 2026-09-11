@@ -1,22 +1,129 @@
 /**
  * MediKiosk Interactive Anatomical Body Map Component (Hospital Clean White Theme)
- * Provides clickable SVG human body map for localized pain and symptom exploration.
+ * Provides clickable SVG human body map for localized pain and symptom exploration across 8 languages.
  */
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
+import { getTranslation } from "../config.js";
 
 export function renderBodyMapPicker(container, onAreaSelected) {
     const state = kioskState.getState();
+    const lang = state.language || "hi";
+    const t = getTranslation(lang);
 
     const bodyAreas = [
-        { id: "chest", nameHi: "छाती / हृदय", nameEn: "Chest / Heart Area", icon: "🫀" },
-        { id: "head", nameHi: "सिर / मस्तिष्क", nameEn: "Head / Forehead", icon: "🧠" },
-        { id: "abdomen", nameHi: "पेट / नाभि", nameEn: "Abdomen / Stomach", icon: "🤢" },
-        { id: "knee", nameHi: "घुटने / जोड़", nameEn: "Knees / Joints", icon: "🦵" },
-        { id: "back", nameHi: "कमर / रीढ़", nameEn: "Lower Back / Spine", icon: "🦴" },
-        { id: "throat", nameHi: "गला / गर्दन", nameEn: "Throat / Neck", icon: "🗣️" },
-        { id: "arms", nameHi: "हाथ / बांह", nameEn: "Arms / Shoulders", icon: "💪" },
-        { id: "skin", nameHi: "त्वचा / एलर्जी", nameEn: "Skin / Rashes", icon: "🩹" }
+        {
+            id: "chest",
+            icon: "🫀",
+            names: {
+                hi: "छाती / हृदय",
+                pa: "ਛਾਤੀ / ਦਿਲ",
+                bn: "বুক / হৃদপিণ্ড",
+                ta: "மார்பு / இதயம்",
+                te: "ఛాతీ / గుండె",
+                mr: "छाती / हृदय",
+                gu: "છાતી / હૃદય",
+                en: "Chest / Heart Area"
+            }
+        },
+        {
+            id: "head",
+            icon: "🧠",
+            names: {
+                hi: "सिर / मस्तिष्क",
+                pa: "ਸਿਰ / ਦਿਮਾਗ਼",
+                bn: "মাথা / মস্তিষ্ক",
+                ta: "தலை / மூளை",
+                te: "తల / మెదడు",
+                mr: "डोके / मेंदू",
+                gu: "માથું / મગજ",
+                en: "Head / Forehead"
+            }
+        },
+        {
+            id: "abdomen",
+            icon: "🤢",
+            names: {
+                hi: "पेट / नाभि",
+                pa: "ਢਿੱਡ / ਨਾਭੀ",
+                bn: "পেট / নাভি",
+                ta: "வயிறு / தொப்புள்",
+                te: "పొట్ట / నాభి",
+                mr: "पोट / नाभी",
+                gu: "પેટ / ડૂંટી",
+                en: "Abdomen / Stomach"
+            }
+        },
+        {
+            id: "knee",
+            icon: "🦵",
+            names: {
+                hi: "घुटने / जोड़",
+                pa: "ਗੋਡੇ / ਜੋੜ",
+                bn: "হাঁটু / জয়েন্ট",
+                ta: "முழங்கால் / மூட்டுகள்",
+                te: "మోకాళ్ళు / కీళ్ళు",
+                mr: "गुडघे / सांधे",
+                gu: "ઘૂંટણ / સાંધા",
+                en: "Knees / Joints"
+            }
+        },
+        {
+            id: "back",
+            icon: "🦴",
+            names: {
+                hi: "कमर / रीढ़",
+                pa: "ਲੱਕ / ਰੀੜ੍ਹ",
+                bn: "কোমর / মেরুদণ্ড",
+                ta: "முதுகு / தண்டுவடம்",
+                te: "వెన్ను / నడుము",
+                mr: "कंबर / पाठीचा कणा",
+                gu: "કમર / કરોડરજ્જુ",
+                en: "Lower Back / Spine"
+            }
+        },
+        {
+            id: "throat",
+            icon: "🗣️",
+            names: {
+                hi: "गला / गर्दन",
+                pa: "ਗਲਾ / ਗਰਦਨ",
+                bn: "গলা / ঘাড়",
+                ta: "தொண்டை / கழுத்து",
+                te: "గొంతు / మెడ",
+                mr: "घसा / मान",
+                gu: "ગળું / ગરદન",
+                en: "Throat / Neck"
+            }
+        },
+        {
+            id: "arms",
+            icon: "💪",
+            names: {
+                hi: "हाथ / बांह",
+                pa: "ਹੱਥ / ਬਾਹਾਂ",
+                bn: "হাত / বাহু",
+                ta: "கைகள் / தோள்பட்டை",
+                te: "చేతులు / భుజాలు",
+                mr: "हात / खांदे",
+                gu: "હાથ / ખભા",
+                en: "Arms / Shoulders"
+            }
+        },
+        {
+            id: "skin",
+            icon: "🩹",
+            names: {
+                hi: "त्वचा / एलर्जी",
+                pa: "ਚਮੜੀ / ਐਲਰਜੀ",
+                bn: "ত্বক / অ্যালার্জি",
+                ta: "தோல் / ஒவ்வாமை",
+                te: "చర్మం / అలర్జీ",
+                mr: "त्वचा / ऍलर्जी",
+                gu: "ત્વચા / એલર્જી",
+                en: "Skin / Rashes"
+            }
+        }
     ];
 
     container.innerHTML = `
@@ -24,21 +131,24 @@ export function renderBodyMapPicker(container, onAreaSelected) {
             
             <div style="text-align: center; margin-bottom: 24px;">
                 <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">
-                    ${state.language === 'en' ? 'Select Affected Body Region' : 'तकलीफ़ का मुख्य स्थान चुनें'}
+                    ${t.bodyMapTitle || 'Select Affected Body Region'}
                 </h2>
                 <p style="font-size: var(--font-size-base); color: var(--text-secondary);">
-                    ${state.language === 'en' ? 'Tap on the anatomical region where you feel pain, discomfort, or symptoms.' : 'नीचे दिए गए शरीर के अंगों में से जहां दर्द या तकलीफ़ है, उस पर स्पर्श करें।'}
+                    ${t.bodyMapSub || 'Tap on the anatomical region where you feel pain, discomfort, or symptoms.'}
                 </p>
             </div>
 
             <!-- Body Map Interactive Grid -->
             <div class="chip-grid" style="max-width: 820px; margin-bottom: 24px;">
-                ${bodyAreas.map(area => `
-                    <button class="touch-chip" data-area-id="${area.id}" data-area-name="${area.nameEn}" aria-label="${area.nameEn}">
-                        <span style="font-size: 26px;">${area.icon}</span>
-                        <span>${state.language === 'en' ? area.nameEn : area.nameHi}</span>
-                    </button>
-                `).join('')}
+                ${bodyAreas.map(area => {
+                    const areaName = area.names[lang] || area.names.hi;
+                    return `
+                        <button class="touch-chip" data-area-id="${area.id}" data-area-name="${areaName}" aria-label="${areaName}">
+                            <span style="font-size: 26px;">${area.icon}</span>
+                            <span>${areaName}</span>
+                        </button>
+                    `;
+                }).join('')}
             </div>
 
             <!-- Visual SVG Human Outline Graphic -->
@@ -64,10 +174,8 @@ export function renderBodyMapPicker(container, onAreaSelected) {
 
     // Speak prompt
     setTimeout(() => {
-        const prompt = state.language === 'en'
-            ? "Please tap on the body area where you are feeling discomfort."
-            : "कृपया उस अंग पर स्पर्श करें जहां आपको तकलीफ़ है।";
-        audioController.speak(prompt, state.language);
+        const prompt = t.bodyMapSub || "Please tap on the body area where you are feeling discomfort.";
+        audioController.speak(prompt, lang);
     }, 300);
 
     // Click handler for body chips

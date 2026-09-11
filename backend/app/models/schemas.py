@@ -20,11 +20,26 @@ JSON_TYPE = JSON().with_variant(JSONB, "postgresql")
 
 metadata = MetaData()
 
+# 0. Hospitals Table (Network of Linked Hospitals)
+hospitals = Table(
+    "hospitals",
+    metadata,
+    Column("hospital_id", String(32), primary_key=True),
+    Column("name", String(192), nullable=False),
+    Column("name_vernacular", JSON_TYPE, nullable=True),
+    Column("city", String(64), nullable=False),
+    Column("state", String(64), nullable=False),
+    Column("hospital_type", String(32), nullable=False, default="CENTRAL_INSTITUTE"), # AYUSH_CENTRAL, AIIMS_ALLOPATHIC, DISTRICT_GOVT
+    Column("badge", String(64), nullable=True),
+    Column("is_active", Boolean, nullable=False, default=True),
+)
+
 # 1. Departments Table
 departments = Table(
     "departments",
     metadata,
     Column("department_id", String(32), primary_key=True),
+    Column("hospital_id", String(32), ForeignKey("hospitals.hospital_id"), nullable=True),
     Column("name", String(128), nullable=False),
     Column("clinical_discipline", String(32), nullable=False), # 'ALLOPATHY' | 'AYUSH'
     Column("is_active", Boolean, nullable=False, default=True),
@@ -92,6 +107,7 @@ visit_sessions = Table(
     metadata,
     Column("session_id", String(36), primary_key=True),
     Column("patient_id", String(32), ForeignKey("patients.patient_id"), nullable=False),
+    Column("hospital_id", String(32), ForeignKey("hospitals.hospital_id"), nullable=True),
     Column("department_id", String(32), ForeignKey("departments.department_id"), nullable=True),
     Column("assigned_room", String(64), nullable=True),
     Column("intake_language", String(8), nullable=False, default="hi"),
@@ -193,6 +209,7 @@ token_records = Table(
     Column("token_id", String(36), primary_key=True),
     Column("session_id", String(36), ForeignKey("visit_sessions.session_id"), nullable=False),
     Column("patient_id", String(32), ForeignKey("patients.patient_id"), nullable=False),
+    Column("hospital_id", String(32), ForeignKey("hospitals.hospital_id"), nullable=True),
     Column("token_number", Integer, nullable=False),
     Column("department_id", String(32), ForeignKey("departments.department_id"), nullable=False),
     Column("priority_tier", String(16), nullable=False, default="NORMAL"), # NORMAL, AMBER, RED

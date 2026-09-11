@@ -1,8 +1,103 @@
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.schemas import departments, doctors, staff_users, patients
+from app.models.schemas import hospitals, departments, doctors, staff_users, patients
 from app.core.security import hash_password, encrypt_phone, compute_search_hash
+
+# 0. Top Linked Healthcare Institutes
+INITIAL_HOSPITALS = [
+    {
+        "hospital_id": "HOSP-AIIA-ND",
+        "name": "All India Institute of Ayurveda (AIIA), New Delhi",
+        "name_vernacular": {
+            "hi": "अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली",
+            "pa": "ਆਲ ਇੰਡੀਆ ਇੰਸਟੀਚਿਊਟ ਆਫ਼ ਆਯੁਰਵੇਦ, ਨਵੀਂ ਦਿੱਲੀ",
+            "bn": "অল ইন্ডিয়া ইনস্টিটিউট অফ আয়ুর্বেদ, নতুন দিল্লি",
+            "ta": "அகில இந்திய ஆயுர்வேத நிறுவனம், புது தில்லி",
+            "te": "ఆల్ ఇండియా ఇన్స్టిట్యూట్ ఆఫ్ ఆయుర్వేద, న్యూఢిల్లీ",
+            "mr": "अखिल भारतीय आयुर्वेद संस्थान, नवी दिल्ली",
+            "gu": "ઓલ ઇન્ડિયા ઇન્સ્ટિટ્યૂટ ઓફ આયુર્વેદ, નવી દિલ્હી",
+            "en": "All India Institute of Ayurveda (AIIA), New Delhi"
+        },
+        "city": "New Delhi",
+        "state": "Delhi",
+        "hospital_type": "AYUSH_CENTRAL",
+        "badge": "Apex AYUSH Institute • MoA",
+        "is_active": True
+    },
+    {
+        "hospital_id": "HOSP-AIIMS-ND",
+        "name": "All India Institute of Medical Sciences (AIIMS), New Delhi",
+        "name_vernacular": {
+            "hi": "अखिल भारतीय आयुर्विज्ञान संस्थान (एम्स), नई दिल्ली",
+            "pa": "ਏਮਜ਼ (AIIMS), ਨਵੀਂ ਦਿੱਲੀ",
+            "bn": "এইমস (AIIMS), নতুন দিল্লি",
+            "ta": "எய்ம்ஸ் (AIIMS), புது தில்லி",
+            "te": "ఎయిమ్స్ (AIIMS), న్యూఢిల్లీ",
+            "mr": "एम्स (AIIMS), नवी दिल्ली",
+            "gu": "એઈમ્સ (AIIMS), નવી દિલ્હી",
+            "en": "All India Institute of Medical Sciences (AIIMS), New Delhi"
+        },
+        "city": "New Delhi",
+        "state": "Delhi",
+        "hospital_type": "AIIMS_ALLOPATHIC",
+        "badge": "Apex Modern Medical Center • MoHFW",
+        "is_active": True
+    },
+    {
+        "hospital_id": "HOSP-SAF-ND",
+        "name": "Safdarjung Hospital & VMMC, New Delhi",
+        "name_vernacular": {
+            "hi": "सफदरजंग अस्पताल एवं वीएमएमसी, नई दिल्ली",
+            "en": "Safdarjung Hospital & VMMC, New Delhi"
+        },
+        "city": "New Delhi",
+        "state": "Delhi",
+        "hospital_type": "CENTRAL_GOVT",
+        "badge": "Central Govt Multi-Speciality",
+        "is_active": True
+    },
+    {
+        "hospital_id": "HOSP-RML-ND",
+        "name": "Dr. Ram Manohar Lohia Hospital, New Delhi",
+        "name_vernacular": {
+            "hi": "डॉ. राम मनोहर लोहिया अस्पताल (RML), नई दिल्ली",
+            "en": "Dr. Ram Manohar Lohia Hospital, New Delhi"
+        },
+        "city": "New Delhi",
+        "state": "Delhi",
+        "hospital_type": "CENTRAL_GOVT",
+        "badge": "Central Govt Hospital",
+        "is_active": True
+    },
+    {
+        "hospital_id": "HOSP-NIA-JP",
+        "name": "National Institute of Ayurveda (NIA), Jaipur",
+        "name_vernacular": {
+            "hi": "राष्ट्रीय आयुर्वेद संस्थान (NIA), जयपुर",
+            "en": "National Institute of Ayurveda (NIA), Jaipur"
+        },
+        "city": "Jaipur",
+        "state": "Rajasthan",
+        "hospital_type": "AYUSH_CENTRAL",
+        "badge": "National Institute • Deemed University",
+        "is_active": True
+    },
+    {
+        "hospital_id": "HOSP-ITRA-GJ",
+        "name": "Institute of Teaching and Research in Ayurveda (ITRA), Jamnagar",
+        "name_vernacular": {
+            "hi": "आयुर्वेद शिक्षण एवं अनुसंधान संस्थान (ITRA), जामनगर",
+            "gu": "આયુર્વેદ શિક્ષણ અને સંશોધન સંસ્થા (ITRA), જામનગર",
+            "en": "Institute of Teaching and Research in Ayurveda (ITRA), Jamnagar"
+        },
+        "city": "Jamnagar",
+        "state": "Gujarat",
+        "hospital_type": "AYUSH_CENTRAL",
+        "badge": "Institute of National Importance (INI)",
+        "is_active": True
+    }
+]
 
 # 1. 14 Standardized Allopathic and AYUSH Departments
 INITIAL_DEPARTMENTS = [
@@ -154,8 +249,15 @@ INITIAL_PATIENTS = [
 
 async def seed_database(db: AsyncSession):
     """
-    Idempotently seeds all core departments, clinical doctors, staff, and test patients.
+    Idempotently seeds all core linked hospitals, departments, clinical doctors, staff, and test patients.
     """
+    # 0. Seed Linked Hospitals
+    for hosp in INITIAL_HOSPITALS:
+        q = select(hospitals).where(hospitals.c.hospital_id == hosp["hospital_id"])
+        existing = (await db.execute(q)).fetchone()
+        if not existing:
+            await db.execute(hospitals.insert().values(**hosp))
+
     # 1. Seed Departments
     for dept in INITIAL_DEPARTMENTS:
         q = select(departments).where(departments.c.department_id == dept["department_id"])

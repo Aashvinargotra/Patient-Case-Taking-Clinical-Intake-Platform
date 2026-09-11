@@ -5,6 +5,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap');
 
 :root {
+  /* Dynamic Accessibility Font Scale Multiplier */
+  --font-scale: 1;
+
   /* Color Palette - Calming Clinical & Ayurvedic Parity */
   --primary-teal: #0d9488;
   --primary-teal-dark: #0f766e;
@@ -45,18 +48,18 @@
   --glass-blur: blur(12px);
   --glass-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
 
-  /* Typography */
+  /* Typography Scales Cleanly with --font-scale */
   --font-family: 'Inter', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
-  --font-size-sm: 16px;
-  --font-size-base: 20px;
-  --font-size-lg: 24px;
-  --font-size-xl: 32px;
-  --font-size-2xl: 42px;
-  --font-size-hero: 56px;
+  --font-size-sm: calc(15px * var(--font-scale, 1));
+  --font-size-base: calc(18px * var(--font-scale, 1));
+  --font-size-lg: calc(22px * var(--font-scale, 1));
+  --font-size-xl: calc(28px * var(--font-scale, 1));
+  --font-size-2xl: calc(36px * var(--font-scale, 1));
+  --font-size-hero: calc(48px * var(--font-scale, 1));
 
   /* Accessibility & Tap Target Spacings */
-  --tap-target-min: 56px;
-  --tap-target-large: 72px;
+  --tap-target-min: 52px;
+  --tap-target-large: 68px;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -68,9 +71,7 @@
   --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ==========================================================================
-   High-Contrast Mode (Elderly & Low-Vision Accessibility)
-   ========================================================================== */
+/* High-Contrast Mode */
 body.high-contrast {
   --bg-main: #000000;
   --bg-surface: #000000;
@@ -86,17 +87,6 @@ body.high-contrast {
   --glass-bg: #000000;
   --glass-border: #ffffff;
   --glass-blur: none;
-}
-
-body.large-text {
-  --font-size-sm: 20px;
-  --font-size-base: 26px;
-  --font-size-lg: 32px;
-  --font-size-xl: 40px;
-  --font-size-2xl: 52px;
-  --font-size-hero: 68px;
-  --tap-target-min: 68px;
-  --tap-target-large: 84px;
 }
 
 /* Global Reset & Base */

@@ -1,172 +1,199 @@
 /**
- * MediKiosk Web Portals Main Application Coordinator
+ * MediKiosk Dedicated Physician Clinical Console Coordinator
  */
 import { PORTAL_CONFIG } from "./config.js";
 import { portalState } from "./state.js";
 import { portalApi } from "./api.js";
 
 // Views
+import { renderDoctorLogin } from "./views/doctor_login.js";
+import { renderDoctorQueueView } from "./views/doctor_queue_view.js";
 import { renderDoctorDashboard } from "./views/doctor_dashboard.js";
-import { renderTriageMonitor } from "./views/triage_monitor.js";
-import { renderPublicDisplay } from "./views/public_display.js";
-import { renderAdminAnalytics } from "./views/admin_analytics.js";
-import { renderPatientPortal } from "./views/patient_portal.js";
 
-class PortalApp {
+class DoctorPortalApp {
     constructor() {
         this.navContainer = document.getElementById("sidebar-nav-root");
         this.viewportContainer = document.getElementById("portal-viewport-root");
         this.hotkeyModalContainer = document.getElementById("hotkey-modal-root");
-        this.roleSelector = document.getElementById("role-selector");
-        this.deptSelector = document.getElementById("dept-selector");
+        this.sidebarProfile = document.querySelector(".sidebar-footer");
+        this.deptBadgeText = document.getElementById("badge-dept-text");
+        this.currentTab = "QUEUE"; // QUEUE | CONSULTATION
     }
 
     init() {
-        console.log("Initializing MediKiosk Web Portals...");
-        this.renderSidebarNav();
+        console.log("Initializing MediKiosk Dedicated Physician Console...");
         this.bindGlobalHotkeys();
-        this.bindRoleAndDeptSelectors();
         
-        // Initial view
-        this.switchView("DOCTOR");
+        // Start at Doctor Authentication or Queue
+        const state = portalState.getState();
+        if (!state.isLoggedIn) {
+            this.showLogin();
+        } else {
+            this.renderSidebarNav();
+            this.renderUserProfile();
+            this.switchTab("QUEUE");
+        }
+    }
+
+    showLogin() {
+        this.navContainer.innerHTML = `
+            <div style="padding: 12px; color: #64748b; font-size: 13px; text-align: center;">
+                🔒 Please sign in to access clinical records.
+            </div>
+        `;
+        if (this.sidebarProfile) {
+            this.sidebarProfile.innerHTML = `
+                <div style="font-size: 12px; color: #64748b; text-align: center; padding: 6px;">
+                    Doctor Authentication Required
+                </div>
+            `;
+        }
+
+        renderDoctorLogin(this.viewportContainer, (doc) => {
+            portalState.setState({ isLoggedIn: true });
+            this.renderSidebarNav();
+            this.renderUserProfile();
+            this.updateHeaderBadges();
+            this.switchTab("QUEUE");
+        });
+    }
+
+    updateHeaderBadges() {
+        const state = portalState.getState();
+        if (this.deptBadgeText) {
+            this.deptBadgeText.textContent = `${state.activeDepartmentName || 'Kayachikitsa OPD'} • ${state.activeRoom || 'Room A-101'}`;
+        }
+    }
+
+    renderUserProfile() {
+        if (!this.sidebarProfile) return;
+        const state = portalState.getState();
+        if (state.isLoggedIn) {
+            this.sidebarProfile.innerHTML = `
+                <div class="user-profile-badge" style="display: flex; align-items: center; justify-content: space-between; width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: var(--radius-sm); padding: 10px 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="user-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: #0d9488; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px;">DR</div>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 800; color: #0f172a;">${state.activeDoctorName}</div>
+                            <div style="font-size: 11px; color: #0d9488; font-weight: 700;">${state.activeRoom}</div>
+                        </div>
+                    </div>
+                    <button id="btn-doc-logout" title="Sign Out" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; padding: 4px;">
+                        🚪
+                    </button>
+                </div>
+            `;
+            const logoutBtn = this.sidebarProfile.querySelector("#btn-doc-logout");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    portalState.setState({ isLoggedIn: false, selectedPatientId: null });
+                    this.showLogin();
+                });
+            }
+        }
     }
 
     renderSidebarNav() {
         const navItems = [
-            { id: "DOCTOR", icon: "🩺", label: "Doctor Dashboard" },
-            { id: "TRIAGE", icon: "🚨", label: "Triage Staff Monitor" },
-            { id: "PUBLIC_BOARD", icon: "📺", label: "Public Queue TV" },
-            { id: "ADMIN", icon: "📊", label: "Admin Analytics" },
-            { id: "PATIENT", icon: "📱", label: "MyMediKiosk Portal" }
+            { id: "QUEUE", icon: "📋", label: "My Assigned Patient Queue" },
+            { id: "CONSULTATION", icon: "🩺", label: "Active Consultation Cabin" }
         ];
 
-        const state = portalState.getState();
         this.navContainer.innerHTML = navItems.map(item => `
-            <div class="nav-item ${state.currentRole === item.id ? 'active' : ''}" data-role-id="${item.id}">
-                <span>${item.icon}</span>
+            <div class="nav-item ${this.currentTab === item.id ? 'active' : ''}" data-tab-id="${item.id}">
+                <span style="font-size: 18px;">${item.icon}</span>
                 <span>${item.label}</span>
             </div>
         `).join('');
 
         this.navContainer.querySelectorAll(".nav-item").forEach(el => {
             el.addEventListener("click", () => {
-                const roleId = el.getAttribute("data-role-id");
-                this.switchView(roleId);
+                const tabId = el.getAttribute("data-tab-id");
+                this.switchTab(tabId);
             });
         });
     }
 
-    bindRoleAndDeptSelectors() {
-        if (this.roleSelector) {
-            this.roleSelector.addEventListener("change", (e) => {
-                this.switchView(e.target.value);
+    switchTab(tabId) {
+        this.currentTab = tabId;
+        this.renderSidebarNav();
+        this.viewportContainer.innerHTML = "";
+
+        if (tabId === "QUEUE") {
+            renderDoctorQueueView(this.viewportContainer, (patId) => {
+                portalState.setState({ selectedPatientId: patId });
+                this.switchTab("CONSULTATION");
             });
-        }
-        if (this.deptSelector) {
-            this.deptSelector.addEventListener("change", (e) => {
-                portalState.setState({ activeDepartment: e.target.value });
-                this.switchView(portalState.getState().currentRole);
+        } else if (tabId === "CONSULTATION") {
+            renderDoctorDashboard(this.viewportContainer, () => {
+                this.switchTab("QUEUE");
             });
         }
     }
 
     bindGlobalHotkeys() {
-        // Universal Ctrl+K Patient Search
         window.addEventListener("keydown", (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
                 e.preventDefault();
-                this.openHotkeySearchModal();
-            }
-            if (e.key === "Escape") {
-                this.closeHotkeySearchModal();
+                this.openQuickSearchModal();
             }
         });
 
         const trigger = document.getElementById("hotkey-search-trigger");
         if (trigger) {
-            trigger.addEventListener("click", () => this.openHotkeySearchModal());
+            trigger.addEventListener("click", () => this.openQuickSearchModal());
         }
     }
 
-    openHotkeySearchModal() {
+    openQuickSearchModal() {
         this.hotkeyModalContainer.innerHTML = `
-            <div class="hotkey-modal-overlay" id="hotkey-overlay">
-                <div class="hotkey-modal-card">
-                    <input type="text" class="hotkey-input" id="search-pat-input" placeholder="Search by Patient ID, Name, or ABHA (e.g. PAT-DEMO-01, Rahul Verma)..." autofocus />
-                    <div style="padding: 16px 20px; max-height: 280px; overflow-y: auto;" id="search-results-list">
-                        <div style="font-size: 12px; color: var(--portal-text-muted); padding: 8px 0;">RECENT PATIENTS:</div>
-                        <div class="search-result-row" data-pat-id="PAT-DEMO-01" style="padding: 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--portal-border);">
+            <div class="modal-overlay" role="dialog" aria-modal="true" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px);">
+                <div class="modal-dialog" style="width: 100%; max-width: 580px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 24px; box-shadow: 0 20px 50px rgba(15,23,42,0.25);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                        <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">🔍 Quick Patient Case Lookup</h3>
+                        <button id="btn-close-search" style="background: none; border: none; font-size: 20px; color: #64748b; cursor: pointer;">✕</button>
+                    </div>
+                    <input type="text" id="input-modal-search" 
+                           placeholder="Type Patient Name, ABHA ID, or Token Number..." 
+                           autofocus
+                           style="width: 100%; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 15px; outline: none; margin-bottom: 16px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="search-result-row" data-pat-id="PAT-DEMO-01" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
                             <div>
-                                <strong style="color: #ffffff;">Rahul Verma</strong> <span style="color: var(--portal-text-muted);">(PAT-DEMO-01)</span>
-                                <div style="font-size: 12px; color: #fca5a5;">🚨 ACS Suspicion • Crushing chest pain</div>
+                                <span style="font-weight: 800; color: #0f172a;">Rahul Verma</span>
+                                <span style="color: #64748b; font-size: 12px; margin-left: 8px;">PAT-DEMO-01 • Token #101</span>
                             </div>
-                            <span class="badge badge-red">Cardiology</span>
+                            <span class="badge badge-red">Cardiology (RED)</span>
                         </div>
-                        <div class="search-result-row" data-pat-id="PAT-DEMO-02" style="padding: 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="search-result-row" data-pat-id="PAT-DEMO-02" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
                             <div>
-                                <strong style="color: #ffffff;">Gurpreet Singh</strong> <span style="color: var(--portal-text-muted);">(PAT-DEMO-02)</span>
-                                <div style="font-size: 12px; color: #fcd34d;">⚠️ Joint pain • Sandhi Vata</div>
+                                <span style="font-weight: 800; color: #0f172a;">Gurpreet Singh</span>
+                                <span style="color: #64748b; font-size: 12px; margin-left: 8px;">PAT-DEMO-02 • Token #102</span>
                             </div>
-                            <span class="badge badge-amber">Kayachikitsa</span>
+                            <span class="badge badge-amber">Kayachikitsa (AMBER)</span>
                         </div>
                     </div>
                 </div>
             </div>
         `;
 
-        const overlay = document.getElementById("hotkey-overlay");
-        overlay.addEventListener("click", (e) => {
-            if (e.target === overlay) this.closeHotkeySearchModal();
+        this.hotkeyModalContainer.querySelector("#btn-close-search").addEventListener("click", () => {
+            this.hotkeyModalContainer.innerHTML = "";
         });
 
         this.hotkeyModalContainer.querySelectorAll(".search-result-row").forEach(row => {
             row.addEventListener("click", () => {
                 const patId = row.getAttribute("data-pat-id");
-                portalState.setState({ selectedPatientId: patId, currentRole: "DOCTOR" });
-                this.closeHotkeySearchModal();
-                this.switchView("DOCTOR");
+                portalState.setState({ selectedPatientId: patId });
+                this.hotkeyModalContainer.innerHTML = "";
+                this.switchTab("CONSULTATION");
             });
         });
     }
-
-    closeHotkeySearchModal() {
-        this.hotkeyModalContainer.innerHTML = "";
-    }
-
-    async switchView(roleId) {
-        portalState.setState({ currentRole: roleId });
-        this.renderSidebarNav();
-        if (this.roleSelector) this.roleSelector.value = roleId;
-
-        this.viewportContainer.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--portal-text-muted);">
-                Loading Clinical View...
-            </div>
-        `;
-
-        switch (roleId) {
-            case "DOCTOR":
-                await renderDoctorDashboard(this.viewportContainer);
-                break;
-            case "TRIAGE":
-                await renderTriageMonitor(this.viewportContainer);
-                break;
-            case "PUBLIC_BOARD":
-                await renderPublicDisplay(this.viewportContainer);
-                break;
-            case "ADMIN":
-                await renderAdminAnalytics(this.viewportContainer);
-                break;
-            case "PATIENT":
-                await renderPatientPortal(this.viewportContainer);
-                break;
-            default:
-                await renderDoctorDashboard(this.viewportContainer);
-        }
-    }
 }
 
+// Mount app on DOM load
 document.addEventListener("DOMContentLoaded", () => {
-    const app = new PortalApp();
-    app.init();
+    window.doctorPortalApp = new DoctorPortalApp();
+    window.doctorPortalApp.init();
 });

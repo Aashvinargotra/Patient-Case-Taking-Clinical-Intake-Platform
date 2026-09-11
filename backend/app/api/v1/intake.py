@@ -8,6 +8,7 @@ from sqlalchemy import select, update, insert
 
 from app.db.session import get_db
 from app.models.schemas import (
+    hospitals,
     patients,
     visit_sessions,
     consent_records,
@@ -24,10 +25,20 @@ from app.core.security import generate_signed_qr_token
 
 router = APIRouter(prefix="/intake", tags=["Kiosk Clinical Intake"])
 
+@router.get("/hospitals")
+async def get_linked_hospitals(db: AsyncSession = Depends(get_db)):
+    """
+    Returns list of all active linked network hospitals for OPD registration and parchi generation.
+    """
+    q = select(hospitals).where(hospitals.c.is_active == True)
+    rows = (await db.execute(q)).fetchall()
+    return [dict(r._mapping) for r in rows]
+
 class StartSessionRequest(BaseModel):
     patient_id: str
+    hospital_id: Optional[str] = "HOSP-AIIA-ND"
     discipline: str = Field(default="ALLOPATHY", description="ALLOPATHY | AYUSH")
-    language: str = Field(default="hi", description="hi, en, pa")
+    language: str = Field(default="hi", description="hi, en, pa, ta, te, bn, mr, gu")
     kiosk_terminal_id: str = "KIOSK-TERMINAL-01"
 
 class IntakeTurnRequest(BaseModel):
@@ -40,9 +51,11 @@ class IntakeTurnRequest(BaseModel):
 
 class FinalizeIntakeRequest(BaseModel):
     session_id: str
+    hospital_id: Optional[str] = "HOSP-AIIA-ND"
     discipline: str = "ALLOPATHY"
     slots: Dict[str, Any]
     language: str = "hi"
+    save_mode: str = "GENERATE_PARCHI" # GENERATE_PARCHI | ACCOUNT_ONLY
 
 @router.post("/session/start")
 async def start_intake_session(req: StartSessionRequest, db: AsyncSession = Depends(get_db)):
@@ -171,22 +184,31 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
     # 2. Department & Room Routing
     dept_info = determine_department(chief_complaint, discipline=req.discipline, is_emergency=is_emergency)
 
-    # 3. Generate Signed QR Token
+    # 3. Hospital Name Lookup
+    hosp_name = "All India Institute of Ayurveda (AIIA), New Delhi"
+    if req.hospital_id:
+        h_row = (await db.execute(select(hospitals).where(hospitals.c.hospital_id == req.hospital_id))).fetchone()
+        if h_row:
+            hosp_name = h_row.name
+
+    # 4. Generate Signed QR Token (if generating Parchi)
     token_number = 101 # Sequential counter in production
     signed_qr = generate_signed_qr_token(req.session_id, session.patient_id, token_number)
 
-    await db.execute(token_records.insert().values(
-        token_id=str(uuid.uuid4()),
-        session_id=req.session_id,
-        patient_id=session.patient_id,
-        token_number=token_number,
-        department_id=dept_info["dept_id"],
-        priority_tier=priority_tier,
-        signed_qr_token=signed_qr,
-        queue_status="WAITING"
-    ))
+    if req.save_mode != "ACCOUNT_ONLY":
+        await db.execute(token_records.insert().values(
+            token_id=str(uuid.uuid4()),
+            session_id=req.session_id,
+            patient_id=session.patient_id,
+            hospital_id=req.hospital_id,
+            token_number=token_number,
+            department_id=dept_info["dept_id"],
+            priority_tier=priority_tier,
+            signed_qr_token=signed_qr,
+            queue_status="WAITING"
+        ))
 
-    # 4. Generate Bilingual Draft Summary
+    # 5. Generate Bilingual Draft Summary
     summary_data = generate_bilingual_draft_summary(
         discipline=req.discipline,
         patient_name=patient_name,
@@ -205,14 +227,15 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
         is_draft=True
     ))
 
-    # 5. Update Visit Session to READY_FOR_DR
+    # 6. Update Visit Session
     await db.execute(
         update(visit_sessions)
         .where(visit_sessions.c.session_id == req.session_id)
         .values(
+            hospital_id=req.hospital_id,
             department_id=dept_info["dept_id"],
             assigned_room=dept_info["room"],
-            status="READY_FOR_DR",
+            status="READY_FOR_DR" if req.save_mode != "ACCOUNT_ONLY" else "COMPLETED",
             completion_time=datetime.now(timezone.utc)
         )
     )
@@ -230,8 +253,11 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
 
     return {
         "status": "SUCCESS",
+        "save_mode": req.save_mode,
         "session_id": req.session_id,
-        "token_number": token_number,
+        "hospital_id": req.hospital_id,
+        "hospital_name": hosp_name,
+        "token_number": token_number if req.save_mode != "ACCOUNT_ONLY" else None,
         "department": dept_info["name"],
         "assigned_room": dept_info["room"],
         "priority_tier": priority_tier,

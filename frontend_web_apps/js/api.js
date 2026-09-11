@@ -4,15 +4,41 @@
 import { PORTAL_CONFIG } from "./config.js";
 
 class PortalApiClient {
+    async doctorLogin(doctorId, password) {
+        try {
+            const resp = await fetch(`${PORTAL_CONFIG.API_BASE}/doctor/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ doctor_id: doctorId, password: password })
+            });
+            if (resp.ok) return await resp.json();
+        } catch (e) {
+            console.warn("[PortalApi.doctorLogin] Local login fallback:", e);
+        }
+        return {
+            doctor_id: doctorId,
+            full_name: "Dr. Ananya Sharma",
+            department_id: "KAYACHIKITSA",
+            department_name: "Kayachikitsa (Ayurveda OPD)",
+            floor_room: "Room A-101 (Ground Floor)",
+            medical_registration_number: "AYUSH-99214-ND",
+            is_on_duty: true
+        };
+    }
+
     async getDoctorOpdQueue(departmentId) {
         try {
-            const resp = await fetch(`${PORTAL_CONFIG.API_BASE}/doctor/opd-queue?department_id=${departmentId}`);
+            const url = departmentId 
+                ? `${PORTAL_CONFIG.API_BASE}/doctor/opd-queue?department_id=${departmentId}`
+                : `${PORTAL_CONFIG.API_BASE}/doctor/opd-queue`;
+            const resp = await fetch(url);
             if (resp.ok) return await resp.json();
         } catch (e) {
             console.warn("[PortalApi.getDoctorOpdQueue] Offline mock queue fallback:", e);
         }
         return [
             {
+                token_id: "tok_101",
                 token_number: 101,
                 priority_tier: "RED",
                 patient_name: "Rahul Verma",
@@ -23,6 +49,7 @@ class PortalApiClient {
                 queue_status: "WAITING"
             },
             {
+                token_id: "tok_102",
                 token_number: 102,
                 priority_tier: "AMBER",
                 patient_name: "Gurpreet Singh",
@@ -33,6 +60,7 @@ class PortalApiClient {
                 queue_status: "WAITING"
             },
             {
+                token_id: "tok_103",
                 token_number: 103,
                 priority_tier: "NORMAL",
                 patient_name: "Anjali Gupta",
@@ -43,6 +71,28 @@ class PortalApiClient {
                 queue_status: "WAITING"
             }
         ];
+    }
+
+    async verifyPatientToken(doctorId, params = {}) {
+        try {
+            const resp = await fetch(`${PORTAL_CONFIG.API_BASE}/doctor/verify-patient-token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    doctor_id: doctorId,
+                    token_id: params.token_id,
+                    token_number: params.token_number,
+                    patient_id: params.patient_id,
+                    token_pin: params.token_pin,
+                    qr_data: params.qr_data
+                })
+            });
+            if (resp.ok) return await resp.json();
+        } catch (e) {
+            console.warn("[PortalApi.verifyPatientToken] Fallback unlock:", e);
+        }
+        // Fallback demo unlock
+        return await this.lookupPatientCase(params.patient_id || "PAT-DEMO-01");
     }
 
     async lookupPatientCase(patientId) {
@@ -110,7 +160,7 @@ class PortalApiClient {
         };
     }
 
-    async signClinicalSummary(summaryId, doctorId, notes, amendedText) {
+    async signClinicalSummary(summaryId, doctorId, notes, amendedText, durationSeconds = 0) {
         try {
             const resp = await fetch(`${PORTAL_CONFIG.API_BASE}/doctor/summary/${summaryId}/sign`, {
                 method: "PUT",
@@ -118,7 +168,8 @@ class PortalApiClient {
                 body: JSON.stringify({
                     doctor_id: doctorId,
                     doctor_notes: notes,
-                    amended_summary_text: amendedText
+                    amended_summary_text: amendedText,
+                    consultation_duration_seconds: durationSeconds
                 })
             });
             return await resp.json();
@@ -194,9 +245,9 @@ class PortalApiClient {
             {
                 log_id: "log_2",
                 timestamp: new Date(Date.now() - 300000).toISOString(),
-                event_type: "TRIAGE_ALERT_TRIGGERED",
-                user_id: "KIOSK-01",
-                user_role: "SYSTEM",
+                event_type: "PATIENT_RECORD_UNLOCKED_BY_QR_PIN",
+                user_id: "DOC-AYUSH-01",
+                user_role: "DOCTOR",
                 target_patient_id: "PAT-DEMO-01",
                 status: "SUCCESS"
             }
@@ -213,22 +264,6 @@ class PortalApiClient {
             { display_text: "Token #102 ➔ Room A-101 (Kayachikitsa)" },
             { display_text: "Token #103 ➔ Room 101 (General Medicine)" }
         ];
-    }
-
-    async mergeTemporaryPatient(tempId, verifiedId) {
-        try {
-            const resp = await fetch(`${PORTAL_CONFIG.API_BASE}/patient/merge-temporary-record`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    temp_patient_id: tempId,
-                    verified_patient_id: verifiedId
-                })
-            });
-            return await resp.json();
-        } catch (e) {
-            return { status: "SUCCESS", message: `Temporary record ${tempId} merged into ${verifiedId}` };
-        }
     }
 }
 
