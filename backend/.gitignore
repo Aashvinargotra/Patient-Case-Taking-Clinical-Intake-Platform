@@ -1,0 +1,30 @@
+# Environment & Secrets (NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database & Cache Persistence
+pgdata/
+redis_data/
+
+# Uploaded Files & Temporary OCR Assets
+uploads/
+temp_audio/
+temp_ocr/
+
+# OS Specific
+.DS_Store
+Thumbs.db

@@ -1,0 +1,33 @@
+from .schemas import (
+    metadata,
+    departments,
+    doctors,
+    staff_users,
+    patients,
+    visit_sessions,
+    consent_records,
+    dpdp_data_requests,
+    clinical_summaries,
+    medical_documents,
+    extracted_entities,
+    token_records,
+    triage_alerts,
+    audit_logs,
+)
+
+__all__ = [
+    "metadata",
+    "departments",
+    "doctors",
+    "staff_users",
+    "patients",
+    "visit_sessions",
+    "consent_records",
+    "dpdp_data_requests",
+    "clinical_summaries",
+    "medical_documents",
+    "extracted_entities",
+    "token_records",
+    "triage_alerts",
+    "audit_logs",
+]
