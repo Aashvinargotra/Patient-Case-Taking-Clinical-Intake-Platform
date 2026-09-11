@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MediKiosk Fullscreen Kiosk Layout & Status Bars
+   MediKiosk Fullscreen Kiosk Layout & Status Bars (Hospital Clean White Theme)
    ========================================================================== */
 
 .kiosk-app-container {
@@ -8,67 +8,68 @@
   width: 100vw;
   height: 100vh;
   position: relative;
-  background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0b1120 100%);
+  background: #f8fafc;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Header Bar */
 .kiosk-header {
-  height: 100px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border-bottom: 1px solid var(--glass-border);
+  height: 90px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
   z-index: 50;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .kiosk-branding {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .kiosk-logo-badge {
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-teal), var(--ayush-saffron));
+  background: linear-gradient(135deg, var(--primary-teal), #0284c7);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  box-shadow: 0 4px 14px var(--primary-teal-glow);
+  font-size: 26px;
+  color: #ffffff;
+  box-shadow: 0 4px 12px var(--primary-teal-glow);
 }
 
 .kiosk-title-group h1 {
   font-size: var(--font-size-lg);
   font-weight: 800;
   letter-spacing: -0.5px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0f172a;
 }
 
 .kiosk-title-group p {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .kiosk-header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .header-btn {
   height: var(--tap-target-min);
   padding: 0 20px;
   border-radius: var(--radius-full);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1.5px solid var(--border-subtle);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -76,20 +77,21 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
   transition: all var(--transition-fast);
 }
 
 .header-btn:hover, .header-btn:active {
   background: var(--bg-surface-elevated);
   border-color: var(--border-focus);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .header-btn.active {
   background: var(--primary-teal);
   color: #ffffff;
-  border-color: var(--primary-teal-light);
-  box-shadow: 0 0 16px var(--primary-teal-glow);
+  border-color: var(--primary-teal-dark);
+  box-shadow: 0 4px 12px var(--primary-teal-glow);
 }
 
 .clock-badge {
@@ -97,7 +99,7 @@
   font-weight: 700;
   color: var(--text-primary);
   padding: 8px 16px;
-  background: rgba(0, 0, 0, 0.4);
+  background: #f1f5f9;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
 }
@@ -110,59 +112,65 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  padding: 32px 48px;
+  padding: 28px 40px;
 }
 
 /* Bottom Accessibility Bar */
 .kiosk-footer-accessibility {
-  height: 96px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border-top: 1px solid var(--glass-border);
+  height: 86px;
+  background: #ffffff;
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
   z-index: 50;
+  box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.03);
 }
 
 .access-btn-group {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .access-btn {
   height: var(--tap-target-min);
-  padding: 0 24px;
+  padding: 0 20px;
   border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  border: 2px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1.5px solid var(--border-subtle);
   color: var(--text-primary);
   font-size: var(--font-size-base);
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
   transition: all var(--transition-fast);
 }
 
+.access-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
 .access-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .access-btn.emergency-btn {
-  background: linear-gradient(135deg, var(--emergency-red), var(--emergency-red-dark));
-  border-color: #fca5a5;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #b91c1c;
   color: #ffffff;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
   animation: pulse-glow 2s infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+  0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(220, 38, 38, 0.6); }
 }
 
 /* Fullscreen Modals */
@@ -172,8 +180,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,16 +191,16 @@
 .kiosk-modal-card {
   width: 90%;
   max-width: 680px;
-  background: var(--bg-surface);
+  background: #ffffff;
   border: 2px solid var(--primary-teal);
   border-radius: var(--radius-lg);
-  padding: 40px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  padding: 36px;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
   text-align: center;
-  animation: modal-pop 300ms var(--transition-bounce);
+  animation: modal-pop 250ms var(--transition-bounce);
 }
 
 @keyframes modal-pop {
-  0% { transform: scale(0.85); opacity: 0; }
+  0% { transform: scale(0.9); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }

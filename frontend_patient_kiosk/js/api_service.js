@@ -165,7 +165,76 @@ class ApiService {
             ],
             extracted_labs: []
         };
+    /**
+     * ABHA Gateway OTP Request
+     */
+    async requestAbhaOtp(abhaId) {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/auth/abha/request-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ abha_id: abhaId })
+            });
+            if (resp.ok) return await resp.json();
+        } catch (err) {
+            console.warn("[ApiService.requestAbhaOtp] Offline fallback:", err);
+        }
+        return {
+            txn_id: `ABDM-TXN-${Date.now()}`,
+            message: "ABDM OTP dispatched to registered mobile",
+            demo_otp: "123456"
+        };
+    }
+
+    /**
+     * ABHA Gateway OTP Verification
+     */
+    async verifyAbhaOtp(txnId, otp, abhaId) {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/auth/abha/verify-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ txn_id: txnId, otp: otp, abha_id: abhaId })
+            });
+            if (resp.ok) return await resp.json();
+        } catch (err) {
+            console.warn("[ApiService.verifyAbhaOtp] Offline fallback:", err);
+        }
+        return {
+            access_token: `mock_abha_jwt_${Date.now()}`,
+            patient: {
+                patient_id: "PAT-DEMO-01",
+                full_name: "Aarav Sharma",
+                gender: "MALE",
+                birth_year: 1988,
+                abha_address: abhaId || "aarav.sharma@abdm"
+            }
+        };
+    }
+
+    /**
+     * Register New ABHA Profile
+     */
+    async registerNewAbha(data) {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/auth/abha/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            if (resp.ok) return await resp.json();
+        } catch (err) {
+            console.warn("[ApiService.registerNewAbha] Offline fallback:", err);
+        }
+        return {
+            access_token: `mock_reg_jwt_${Date.now()}`,
+            patient_id: `PAT-${Math.floor(100000 + Math.random() * 900000)}`,
+            abha_number: `14-${Math.floor(1000 + Math.random() * 9000)}-1234-5678`,
+            abha_address: data.desired_abha || `${data.full_name.toLowerCase().split(' ')[0]}@abdm`,
+            full_name: data.full_name
+        };
     }
 }
 
 export const apiService = new ApiService();
+

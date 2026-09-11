@@ -33,7 +33,7 @@
                 <div class="user-profile-badge">
                     <div class="user-avatar">DR</div>
                     <div>
-                        <div style="font-size: 13px; font-weight: 700; color: #fff;">Dr. Rajesh Sharma</div>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--portal-text-main);">Dr. Rajesh Sharma</div>
                         <div style="font-size: 11px; color: var(--portal-text-muted);">Attending Physician (MD)</div>
                     </div>
                 </div>
@@ -47,14 +47,14 @@
             <header class="portal-topbar" role="banner">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <!-- Universal Hotkey Trigger -->
-                    <div class="search-hotkey-trigger" id="hotkey-search-trigger" role="button" tabindex="0" aria-label="Search Patient ID or Name. Press Control K">
+                    <div class="search-hotkey-trigger" id="hotkey-search-trigger" role="button" tabindex="0" aria-label="Search Patient ID or Name. Press Control K" style="background: #f8fafc; border: 1.5px solid var(--portal-border); color: var(--portal-text-main); padding: 8px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
                         <span>🔍</span>
                         <span>Search Patient Case...</span>
-                        <span class="hotkey-badge">Ctrl + K</span>
+                        <span class="hotkey-badge" style="background: #e2e8f0; color: #334155; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Ctrl + K</span>
                     </div>
 
                     <!-- Department Selector -->
-                    <select id="dept-selector" style="background: rgba(0,0,0,0.3); border: 1px solid var(--portal-border); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; outline: none;">
+                    <select id="dept-selector" style="background: #ffffff; border: 1.5px solid var(--portal-border); color: var(--portal-text-main); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; outline: none;">
                         <option value="KAYACHIKITSA">🌿 Kayachikitsa (Ayurveda Med)</option>
                         <option value="GEN_MED">🩺 General Medicine OPD</option>
                         <option value="CARDIOLOGY">🫀 Cardiology OPD</option>
@@ -64,9 +64,9 @@
                     </select>
                 </div>
 
-                <div class="topbar-right">
+                <div class="topbar-right" style="display: flex; align-items: center; gap: 14px;">
                     <!-- Role Switcher -->
-                    <select id="role-selector" style="background: var(--portal-card-elevated); border: 1px solid var(--portal-border); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; outline: none;">
+                    <select id="role-selector" style="background: #f0fdfa; border: 1.5px solid #99f6e4; color: #0d9488; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; outline: none;">
                         <option value="DOCTOR">🩺 Physician Console</option>
                         <option value="TRIAGE">🚨 Triage Monitor</option>
                         <option value="PUBLIC_BOARD">📺 Public Queue TV</option>
@@ -75,15 +75,15 @@
                     </select>
 
                     <!-- WebSocket Connection Dot -->
-                    <div class="ws-status-badge">
-                        <div class="ws-dot"></div>
+                    <div class="ws-status-badge" style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #059669; background: #d1fae5; padding: 6px 12px; border-radius: 9999px;">
+                        <div class="ws-dot" style="width: 8px; height: 8px; background: #059669; border-radius: 50%;"></div>
                         <span>Live Triage WS</span>
                     </div>
                 </div>
             </header>
 
             <!-- Dynamic Viewport Content -->
-            <main class="portal-content-viewport" id="portal-viewport-root" role="main"></main>
+            <main class="portal-content-viewport" id="portal-viewport-root" role="main" style="flex: 1; padding: 24px 32px; overflow-y: auto;"></main>
 
         </div>
 

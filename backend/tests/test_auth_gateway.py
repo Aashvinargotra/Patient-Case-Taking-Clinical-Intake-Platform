@@ -162,3 +162,43 @@ def test_admin_sso_assertion_with_mfa(auth_client):
     data = resp.json()
     assert data["role"] == "ADMIN"
     assert data["staff_role"] == "SUPER_ADMIN"
+
+def test_abha_request_otp_and_verify_flow(auth_client):
+    client, mock_db = auth_client
+    res_mock = MagicMock()
+    res_mock.fetchone.return_value = MOCK_PATIENT
+    mock_db.execute.return_value = res_mock
+
+    # 1. Request OTP
+    resp_req = client.post("/api/v1/auth/abha/request-otp", json={"abha_id": "ramesh.kumar@abdm"})
+    assert resp_req.status_code == 200
+    req_data = resp_req.json()
+    assert "txn_id" in req_data
+    assert req_data["demo_otp"] == "123456"
+
+    # 2. Verify OTP
+    resp_verify = client.post("/api/v1/auth/abha/verify-otp", json={
+        "txn_id": req_data["txn_id"],
+        "otp": "123456",
+        "abha_id": "ramesh.kumar@abdm"
+    })
+    assert resp_verify.status_code == 200
+    verify_data = resp_verify.json()
+    assert "access_token" in verify_data
+    assert verify_data["patient"]["patient_id"] == "PAT-1001"
+
+def test_abha_register_new_flow(auth_client):
+    client, mock_db = auth_client
+    resp = client.post("/api/v1/auth/abha/register", json={
+        "full_name": "Priya Sharma",
+        "gender": "FEMALE",
+        "birth_year": 1995,
+        "mobile": "9876543210",
+        "desired_abha": "priya.sharma@abdm"
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["full_name"] == "Priya Sharma"
+    assert "abha_number" in data
+    assert "access_token" in data
+

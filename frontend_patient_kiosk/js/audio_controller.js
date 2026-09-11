@@ -1,6 +1,6 @@
 /**
- * MediKiosk Audio Controller & Web Audio API Visualizer
- * Manages Speech Synthesis (TTS), Microphone Capture, Waveform Analyzer, and Fallback Handlers.
+ * MediKiosk Audio Controller & Web Speech Recognition Streamer
+ * Manages Multilingual Speech Synthesis (TTS), Microphone Capture, Real-Time Speech Recognition & Waveform Visualizer.
  */
 import { kioskState } from "./state.js";
 
@@ -15,10 +15,19 @@ class AudioController {
         this.mediaRecorder = null;
         this.audioChunks = [];
         this.currentUtterance = null;
+        this.recognition = null;
+        this.isRecognitionActive = false;
+
+        // Initialize voices when available
+        if (this.synth && this.synth.onvoiceschanged !== undefined) {
+            this.synth.onvoiceschanged = () => {
+                this.voices = this.synth.getVoices();
+            };
+        }
     }
 
     /**
-     * Initializes the Web Audio API context and visualizer analyzer.
+     * Initializes Web Audio API analyzer
      */
     async initAudioContext() {
         if (!this.audioCtx) {
@@ -37,9 +46,9 @@ class AudioController {
     }
 
     /**
-     * Starts microphone recording and attaches analyzer stream to animate visual waves.
+     * Starts microphone recording and live speech-to-text recognition
      */
-    async startRecording(onVisualizerTick, onAudioDataAvailable) {
+    async startRecording(onVisualizerTick, onAudioDataAvailable, onLiveTranscript) {
         try {
             await this.initAudioContext();
             this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -72,17 +81,77 @@ class AudioController {
                 this.animationFrameId = requestAnimationFrame(renderFrame);
             };
             renderFrame();
+
+            // Start Live Web Speech Recognition if available in browser
+            this.startLiveRecognition(kioskState.getState().language, onLiveTranscript);
+
             return true;
         } catch (err) {
-            console.error("[AudioController] Microphone permission denied or unavailable:", err);
-            // Graceful fallback to Touch mode
-            kioskState.setState({ intakeMode: "TOUCH", isRecording: false });
+            console.error("[AudioController] Microphone permission or device error:", err);
+            // Fallback to client recognition or touch
+            this.startLiveRecognition(kioskState.getState().language, onLiveTranscript);
             return false;
         }
     }
 
     /**
-     * Stops microphone recording and audio visualizer loop.
+     * Starts continuous live Web Speech API recognition for real-time streaming to UI
+     */
+    startLiveRecognition(lang = "hi", onLiveTranscript = null) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn("[AudioController] Web Speech Recognition not supported in this browser.");
+            return;
+        }
+
+        const langMap = {
+            hi: "hi-IN",
+            pa: "pa-IN",
+            en: "en-IN",
+            bn: "bn-IN",
+            ta: "ta-IN",
+            te: "te-IN",
+            mr: "mr-IN",
+            gu: "gu-IN"
+        };
+
+        try {
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = true;
+            this.recognition.interimResults = true;
+            this.recognition.lang = langMap[lang] || "hi-IN";
+
+            this.recognition.onresult = (event) => {
+                let interimTranscript = "";
+                let finalTranscript = "";
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                const currentText = finalTranscript || interimTranscript;
+                if (onLiveTranscript && currentText) {
+                    onLiveTranscript(currentText, Boolean(finalTranscript));
+                }
+            };
+
+            this.recognition.onerror = (e) => {
+                console.warn("[AudioController] SpeechRecognition error:", e.error);
+            };
+
+            this.recognition.start();
+            this.isRecognitionActive = true;
+        } catch (e) {
+            console.warn("[AudioController] Failed to initialize SpeechRecognition:", e);
+        }
+    }
+
+    /**
+     * Stops microphone recording and speech recognition
      */
     stopRecording() {
         if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
@@ -96,11 +165,17 @@ class AudioController {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
         }
+        if (this.recognition && this.isRecognitionActive) {
+            try {
+                this.recognition.stop();
+            } catch (e) {}
+            this.isRecognitionActive = false;
+        }
         kioskState.setState({ isRecording: false });
     }
 
     /**
-     * Text-To-Speech (TTS) synthesizer with multilingual voice selection and slow-speech toggle.
+     * Text-To-Speech (TTS) synthesizer with multilingual voice selection
      */
     speak(text, lang = "hi", onComplete = null) {
         if (!this.synth) {
@@ -117,9 +192,7 @@ class AudioController {
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
-        const voices = this.synth.getVoices();
-
-        // Language-specific voice selection
+        
         const langMap = {
             hi: "hi-IN",
             pa: "pa-IN",
@@ -134,13 +207,13 @@ class AudioController {
         const targetLang = langMap[lang] || "hi-IN";
         utterance.lang = targetLang;
 
+        const voices = this.synth.getVoices();
         const matchedVoice = voices.find(v => v.lang === targetLang || v.lang.startsWith(lang));
         if (matchedVoice) {
             utterance.voice = matchedVoice;
         }
 
-        // Adjust speed based on accessibility settings
-        utterance.rate = state.slowSpeechMode ? 0.75 : 0.95;
+        utterance.rate = state.slowSpeechMode ? 0.75 : 0.92;
         utterance.pitch = 1.0;
 
         utterance.onstart = () => kioskState.setState({ isSpeaking: true });

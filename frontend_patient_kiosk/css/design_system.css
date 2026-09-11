@@ -1,49 +1,49 @@
 /* ==========================================================================
-   MediKiosk Design System & Accessibility Tokens (Vanilla CSS)
+   MediKiosk Design System & Accessibility Tokens (Hospital Clinical White Theme)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap');
 
 :root {
-  /* Color Palette - Clinical & Ayurvedic Parity */
+  /* Color Palette - Calming Clinical & Ayurvedic Parity */
   --primary-teal: #0d9488;
   --primary-teal-dark: #0f766e;
-  --primary-teal-light: #ccfbf1;
-  --primary-teal-glow: rgba(13, 148, 136, 0.25);
+  --primary-teal-light: #f0fdfa;
+  --primary-teal-glow: rgba(13, 148, 136, 0.18);
 
   --ayush-saffron: #d97706;
   --ayush-saffron-dark: #b45309;
-  --ayush-saffron-light: #fef3c7;
-  --ayush-saffron-glow: rgba(217, 119, 6, 0.25);
+  --ayush-saffron-light: #fffbeb;
+  --ayush-saffron-glow: rgba(217, 119, 6, 0.18);
 
   --allopathy-blue: #0284c7;
   --allopathy-blue-dark: #0369a1;
-  --allopathy-blue-light: #e0f2fe;
+  --allopathy-blue-light: #f0f9ff;
 
   --emergency-red: #dc2626;
   --emergency-red-dark: #991b1b;
-  --emergency-red-light: #fee2e2;
+  --emergency-red-light: #fef2f2;
 
-  --amber-warning: #f59e0b;
-  --success-green: #10b981;
+  --amber-warning: #d97706;
+  --success-green: #059669;
 
-  /* Neutral Dark Mode (Default Kiosk Theme) */
-  --bg-main: #0b1120;
-  --bg-surface: #1e293b;
-  --bg-surface-elevated: #334155;
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --border-focus: #38bdf8;
+  /* Hospital Clean White & Slate Tones */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-focus: #0284c7;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
   --text-muted: #64748b;
-  --text-inverse: #0f172a;
+  --text-inverse: #ffffff;
 
-  /* Glassmorphism */
-  --glass-bg: rgba(30, 41, 59, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-blur: blur(16px);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Clinical Glass & Elevation Cards */
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: #e2e8f0;
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
 
   /* Typography */
   --font-family: 'Inter', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi', sans-serif;
@@ -57,7 +57,7 @@
   /* Accessibility & Tap Target Spacings */
   --tap-target-min: 56px;
   --tap-target-large: 72px;
-  --radius-sm: 8px;
+  --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 9999px;

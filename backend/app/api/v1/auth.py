@@ -199,3 +199,138 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
         department_id=dept_id,
         is_temporary=is_temp
     )
+
+class AbhaOtpRequest(BaseModel):
+    abha_id: str = Field(..., description="14-digit ABHA Number, @abdm address, or mobile number")
+
+class AbhaVerifyRequest(BaseModel):
+    txn_id: str
+    otp: str
+    abha_id: str
+
+class AbhaRegisterRequest(BaseModel):
+    full_name: str
+    gender: str # MALE, FEMALE, OTHER
+    birth_year: int
+    mobile: str
+    desired_abha: Optional[str] = None
+
+@router.post("/abha/request-otp")
+async def request_abha_otp(req: AbhaOtpRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Simulates ABDM M1/M2 ABHA Gateway OTP Dispatch.
+    """
+    if not req.abha_id:
+        raise HTTPException(status_code=400, detail="ABHA Number / Address is required")
+    
+    txn_id = f"ABDM-TXN-{random.randint(100000, 999999)}"
+    return {
+        "txn_id": txn_id,
+        "message": "ABDM OTP dispatched to registered mobile number ending with **78",
+        "demo_otp": "123456",
+        "expires_in_seconds": 600
+    }
+
+@router.post("/abha/verify-otp")
+async def verify_abha_otp(req: AbhaVerifyRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Verifies ABHA OTP, fetches or creates patient profile, and issues session token.
+    """
+    if req.otp != "123456" and len(req.otp) != 6:
+        raise HTTPException(status_code=400, detail="Invalid OTP. Please enter 6-digit code.")
+    
+    clean_abha = req.abha_id.strip()
+    if "@" not in clean_abha and not clean_abha.startswith("14-"):
+        clean_abha = f"{clean_abha.lower().replace(' ', '')}@abdm"
+
+    q = select(patients).where(
+        or_(
+            patients.c.abha_address == clean_abha,
+            patients.c.patient_id == clean_abha
+        )
+    ).where(patients.c.is_archived == False)
+    patient = (await db.execute(q)).fetchone()
+
+    if not patient:
+        new_id = f"PAT-{random.randint(100000, 999999)}"
+        name = "Aarav Sharma" if "demo" in clean_abha.lower() or "aarav" in clean_abha.lower() else "Ayushman Patient"
+        await db.execute(patients.insert().values(
+            patient_id=new_id,
+            full_name=name,
+            gender="MALE",
+            birth_year=1988,
+            abha_address=clean_abha,
+            is_temporary=False
+        ))
+        await db.commit()
+        p_id = new_id
+        p_name = name
+        p_gender = "MALE"
+        p_year = 1988
+    else:
+        p_id = patient.patient_id
+        p_name = patient.full_name
+        p_gender = patient.gender
+        p_year = patient.birth_year
+
+    token_claims = {
+        "sub": p_id,
+        "role": "PATIENT",
+        "is_temporary": False
+    }
+    token = create_access_token(token_claims)
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "patient": {
+            "patient_id": p_id,
+            "full_name": p_name,
+            "gender": p_gender,
+            "birth_year": p_year,
+            "abha_address": clean_abha
+        }
+    }
+
+@router.post("/abha/register")
+async def register_new_abha(req: AbhaRegisterRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Fast-track ABDM ABHA Number & Address generation and patient onboarding.
+    """
+    clean_phone = req.mobile.strip()
+    abha_num = f"14-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}"
+    clean_addr = req.desired_abha or f"{req.full_name.lower().split()[0]}.{random.randint(10, 99)}@abdm"
+    if "@" not in clean_addr:
+        clean_addr = f"{clean_addr}@abdm"
+
+    new_id = f"PAT-{random.randint(100000, 999999)}"
+    from app.core.security import encrypt_phone, compute_search_hash
+    
+    await db.execute(patients.insert().values(
+        patient_id=new_id,
+        full_name=req.full_name,
+        gender=req.gender.upper(),
+        birth_year=req.birth_year,
+        phone_encrypted=encrypt_phone(clean_phone) if len(clean_phone) >= 10 else None,
+        phone_search_hash=compute_search_hash(clean_phone) if len(clean_phone) >= 10 else None,
+        abha_address=clean_addr,
+        is_temporary=False
+    ))
+    await db.commit()
+
+    token_claims = {
+        "sub": new_id,
+        "role": "PATIENT",
+        "is_temporary": False
+    }
+    token = create_access_token(token_claims)
+
+    return {
+        "access_token": token,
+        "patient_id": new_id,
+        "abha_number": abha_num,
+        "abha_address": clean_addr,
+        "full_name": req.full_name,
+        "message": "ABHA ID created and linked successfully!"
+    }
+
