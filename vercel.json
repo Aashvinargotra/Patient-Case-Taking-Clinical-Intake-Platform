@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/frontend_patient_kiosk/(.*)", "destination": "/frontend_patient_kiosk/$1" },
+    { "source": "/frontend_web_apps/(.*)", "destination": "/frontend_web_apps/$1" },
+    { "source": "/kiosk", "destination": "/frontend_patient_kiosk/index.html" },
+    { "source": "/doctor", "destination": "/frontend_web_apps/index.html" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
