@@ -165,6 +165,8 @@ class ApiService {
             ],
             extracted_labs: []
         };
+    }
+
     /**
      * ABHA Gateway OTP Request
      */
