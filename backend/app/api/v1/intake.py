@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, insert
+from sqlalchemy import select, update, insert, func
 
 from app.db.session import get_db
 from app.models.schemas import (
@@ -134,6 +134,7 @@ async def process_intake_turn(req: IntakeTurnRequest, db: AsyncSession = Depends
         "next_step": next_step
     }
 
+@router.post("/finalize")
 @router.post("/session/finalize")
 async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession = Depends(get_db)):
     """
@@ -144,16 +145,50 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
     4. Deterministically routes patient and issues cryptographically signed token slip.
     """
     session = (await db.execute(select(visit_sessions).where(visit_sessions.c.session_id == req.session_id))).fetchone()
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+    
+    patient_id = None
+    if session:
+        patient_id = session.patient_id
+    else:
+        # Resilient auto-creation for 1-tap walk-in / direct kiosk sessions
+        patient_id = f"PAT-WALK-{str(uuid.uuid4())[:6].upper()}"
+        patient_name = "Walk-in Patient"
+        if req.slots and isinstance(req.slots, dict):
+            if req.slots.get("patient_name"):
+                patient_name = req.slots["patient_name"]
+            elif req.slots.get("full_name"):
+                patient_name = req.slots["full_name"]
 
-    patient = (await db.execute(select(patients).where(patients.c.patient_id == session.patient_id))).fetchone()
-    patient_name = patient.full_name if patient else "Patient"
+        await db.execute(patients.insert().values(
+            patient_id=patient_id,
+            full_name=patient_name,
+            gender="MALE",
+            birth_year=1990,
+            is_temporary=True
+        ))
 
-    chief_complaint = req.slots.get("chief_complaint", "General consultation")
+        await db.execute(visit_sessions.insert().values(
+            session_id=req.session_id,
+            patient_id=patient_id,
+            intake_language=req.language or "hi",
+            status="IN_PROGRESS",
+            intake_channel="KIOSK"
+        ))
+        await db.flush()
+        session = (await db.execute(select(visit_sessions).where(visit_sessions.c.session_id == req.session_id))).fetchone()
+
+    patient = (await db.execute(select(patients).where(patients.c.patient_id == patient_id))).fetchone()
+    patient_name = patient.full_name if patient else "Walk-in Patient"
+
+    chief_complaint = req.slots.get("chief_complaint", "General consultation") if req.slots else "General consultation"
+    if not chief_complaint or chief_complaint == "General consultation":
+        for k in ["symptom", "pain_area", "primary_concern", "complaint"]:
+            if req.slots and req.slots.get(k):
+                chief_complaint = str(req.slots[k])
+                break
 
     # 1. Red-Flag Evaluation
-    triage_result = evaluate_slot_scoped_triage(req.slots)
+    triage_result = evaluate_slot_scoped_triage(req.slots or {})
     priority_tier = "NORMAL"
     is_emergency = False
 
@@ -165,7 +200,7 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
         await db.execute(triage_alerts.insert().values(
             alert_id=alert_id,
             session_id=req.session_id,
-            patient_id=session.patient_id,
+            patient_id=patient_id,
             severity_tier=priority_tier,
             trigger_rule=triage_result["rule_id"],
             trigger_slots=triage_result["trigger_slots"],
@@ -191,15 +226,16 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
         if h_row:
             hosp_name = h_row.name
 
-    # 4. Generate Signed QR Token (if generating Parchi)
-    token_number = 101 # Sequential counter in production
-    signed_qr = generate_signed_qr_token(req.session_id, session.patient_id, token_number)
+    # 4. Generate Sequential Token Number & Signed QR Token (if generating Parchi)
+    max_tok = (await db.execute(select(func.max(token_records.c.token_number)))).scalar()
+    token_number = int(max_tok + 1) if (max_tok is not None and max_tok >= 100) else 104
+    signed_qr = generate_signed_qr_token(req.session_id, patient_id, token_number)
 
     if req.save_mode != "ACCOUNT_ONLY":
         await db.execute(token_records.insert().values(
             token_id=str(uuid.uuid4()),
             session_id=req.session_id,
-            patient_id=session.patient_id,
+            patient_id=patient_id,
             hospital_id=req.hospital_id,
             token_number=token_number,
             department_id=dept_info["dept_id"],
@@ -212,7 +248,7 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
     summary_data = generate_bilingual_draft_summary(
         discipline=req.discipline,
         patient_name=patient_name,
-        slots=req.slots,
+        slots=req.slots or {},
         language=req.language
     )
 
@@ -220,7 +256,7 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
     await db.execute(clinical_summaries.insert().values(
         summary_id=summary_id,
         session_id=req.session_id,
-        patient_id=session.patient_id,
+        patient_id=patient_id,
         chief_complaint=chief_complaint,
         structured_history=summary_data["structured_history"],
         draft_summary_text=summary_data["draft_summary_text"],
@@ -260,8 +296,11 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
         "token_number": token_number if req.save_mode != "ACCOUNT_ONLY" else None,
         "department": dept_info["name"],
         "assigned_room": dept_info["room"],
+        "room": dept_info["room"],
         "priority_tier": priority_tier,
         "signed_qr_token": signed_qr,
+        "signed_qr_payload": signed_qr,
+        "estimated_wait_mins": 15,
         "patient_confirmation_text": summary_data["patient_confirmation_text"],
         "draft_summary_text": summary_data["draft_summary_text"],
         "sms_dispatched_count": len(sms_dispatched)
