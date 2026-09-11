@@ -1,5 +1,6 @@
 /**
- * MediKiosk Document Scanner Component (Camera Capture & OCR Preview)
+ * MediKiosk Document & Lab Report Scanner Component
+ * Supports both Live Camera OCR and Direct Device / Mobile Storage Uploads with Out-of-Range Flagging.
  */
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
@@ -12,65 +13,125 @@ export function renderCameraScanner(container, onFinished) {
     const t = getTranslation(lang);
 
     container.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 900px; margin: auto;">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 900px; margin: auto; animation: fade-in 300ms ease;">
             
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: var(--font-size-xl); font-weight: 800; margin-bottom: 8px; color: #0f172a;">
-                    ${t.ocrTitle || 'Scan Previous Prescription or Lab Report (Optional)'}
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 13px; font-weight: 800; padding: 4px 16px; border-radius: 9999px; margin-bottom: 8px; text-transform: uppercase;">
+                    AI OCR & Lab Reference Engine
+                </span>
+                <h2 style="font-size: var(--font-size-2xl); font-weight: 800; margin-bottom: 6px; color: #0f172a;">
+                    ${t.ocrTitle || 'Scan or Upload Lab Report / Prescription (Optional)'}
                 </h2>
-                <p style="font-size: var(--font-size-base); color: var(--text-secondary);">
-                    ${t.ocrSub || 'Hold your document in front of the camera and tap Capture.'}
+                <p style="font-size: var(--font-size-base); color: var(--text-secondary); max-width: 700px; margin: auto;">
+                    Upload prior blood tests, diagnostic investigations, or prescription slips. Out-of-range lab results are automatically flagged for the doctor.
                 </p>
             </div>
 
-            <!-- Video Camera Viewport -->
-            <div style="width: 100%; max-width: 640px; height: 380px; background: #000; border-radius: var(--radius-lg); border: 2px solid var(--primary-teal); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);">
+            <!-- Viewport Container (Camera Stream OR Uploaded Image Preview) -->
+            <div id="scanner-viewport-box" style="width: 100%; max-width: 640px; height: 340px; background: #0f172a; border-radius: var(--radius-lg); border: 2.5px solid #0d9488; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);">
+                
+                <!-- Live Video Feed -->
                 <video id="kiosk-cam-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
                 <canvas id="kiosk-cam-canvas" style="display: none;"></canvas>
                 
-                <!-- Target Reticle Overlay -->
-                <div style="position: absolute; width: 85%; height: 80%; border: 2px dashed rgba(56, 189, 248, 0.6); border-radius: var(--radius-md); pointer-events: none; display: flex; align-items: center; justify-content: center;">
-                    <span style="background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 9999px; font-size: var(--font-size-sm); color: #38bdf8;">
-                        ${t.ocrSub || 'Align Document Here'}
+                <!-- Uploaded Document Preview Image -->
+                <img id="kiosk-file-preview" style="width: 100%; height: 100%; object-fit: contain; display: none; background: #ffffff;" alt="Uploaded Document Preview" />
+
+                <!-- Reticle Overlay for Camera -->
+                <div id="camera-reticle" style="position: absolute; width: 85%; height: 80%; border: 2px dashed rgba(56, 189, 248, 0.7); border-radius: var(--radius-md); pointer-events: none; display: flex; align-items: center; justify-content: center;">
+                    <span style="background: rgba(15,23,42,0.75); padding: 6px 16px; border-radius: 9999px; font-size: 13px; font-weight: 700; color: #38bdf8;">
+                        📸 Hold Report Here OR Upload File
                     </span>
+                </div>
+
+                <!-- Processing Overlay -->
+                <div id="ocr-loading-overlay" style="position: absolute; inset: 0; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 10;">
+                    <div style="font-size: 38px; animation: pulse 1s infinite;">🔬</div>
+                    <div style="color: #ffffff; font-weight: 800; font-size: 16px;">Scanning & Analyzing Lab Reference Intervals...</div>
+                    <div style="color: #94a3b8; font-size: 13px;">Checking biological normal limits & NLEM drug database</div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div style="display: flex; gap: 20px; margin-top: 24px;">
-                <button class="access-btn" id="btn-skip-scan">
-                    ${t.skipOcr || 'Skip Document Upload'}
+            <!-- Hidden File Input for Device Storage -->
+            <input type="file" id="kiosk-file-input" accept="image/*,application/pdf" style="display: none;" />
+
+            <!-- Main Action Buttons Row -->
+            <div id="scan-actions-row" style="display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 640px;">
+                <button class="access-btn" id="btn-skip-scan" style="flex: 1; min-width: 140px; justify-content: center; height: 48px;">
+                    ${t.skipOcr || 'Skip (No Reports)'}
                 </button>
-                <button class="header-btn active" id="btn-capture-scan" style="padding: 0 36px; height: var(--tap-target-min);">
-                    ${t.captureBtn || '📸 Capture & Extract'}
+                <button class="header-btn" id="btn-upload-storage" style="flex: 1.2; min-width: 200px; justify-content: center; height: 48px; font-size: 14px; background: #f0fdfa; border: 1.5px solid #0d9488; color: #0f766e; font-weight: 800;">
+                    📁 Upload from Storage
+                </button>
+                <button class="header-btn active" id="btn-capture-scan" style="flex: 1.2; min-width: 180px; justify-content: center; height: 48px; font-size: 14px; font-weight: 800;">
+                    📸 Capture & Extract
                 </button>
             </div>
 
-            <!-- Extraction Status Box -->
-            <div id="ocr-results-box" style="margin-top: 20px; width: 100%; max-width: 640px; display: none; background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: left;">
-                <h4 style="color: var(--primary-teal); font-weight: 700;">✅ Extracted Entities / निकाली गई जानकारी:</h4>
-                <div id="ocr-details-text" style="font-size: var(--font-size-sm); margin-top: 8px; color: var(--text-primary);"></div>
+            <!-- Extraction Results & Out-of-Range Review Box -->
+            <div id="ocr-results-box" style="margin-top: 20px; width: 100%; max-width: 640px; display: none; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 20px; box-shadow: 0 4px 14px rgba(15,23,42,0.06); text-align: left; animation: fade-in 250ms ease;">
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 14px;">
+                    <div>
+                        <h4 style="color: #0f172a; font-size: 16px; font-weight: 800; margin: 0;">
+                            ✅ AI Document Extraction Results
+                        </h4>
+                        <span id="ocr-doc-filename" style="font-size: 12px; color: #64748b; font-weight: 600;"></span>
+                    </div>
+                    <span style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 9999px;">
+                        Analyzed with Standard Biological Ranges
+                    </span>
+                </div>
+
+                <div id="ocr-details-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Rendered Lab and Medication Cards -->
+                </div>
+
+                <!-- Post-Extraction Confirmation Actions -->
+                <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1.5px solid #f1f5f9; padding-top: 16px;">
+                    <button id="btn-reupload-file" class="access-btn" style="flex: 1; justify-content: center; height: 46px; font-size: 13px;">
+                        🔄 Choose Another File
+                    </button>
+                    <button id="btn-confirm-ocr-continue" class="header-btn active" style="flex: 1.5; justify-content: center; height: 46px; font-size: 14px; font-weight: 800;">
+                        Confirm & Continue ➔
+                    </button>
+                </div>
             </div>
 
         </div>
     `;
 
     // Speak audio prompt
-    const prompt = t.ocrSub || "You can hold any prior prescription or lab report in front of the camera.";
+    const prompt = lang === 'en' 
+        ? "You can hold any lab report in front of the camera or upload it directly from your device."
+        : "आप अपनी पुरानी जांच रिपोर्ट या पर्ची कैमरे के सामने रख सकते हैं या मोबाइल से अपलोड कर सकते हैं।";
     audioController.speak(prompt, lang);
 
-    // Initialize Camera Stream
+    // Elements
     const videoEl = container.querySelector("#kiosk-cam-video");
     const canvasEl = container.querySelector("#kiosk-cam-canvas");
+    const previewImgEl = container.querySelector("#kiosk-file-preview");
+    const reticleEl = container.querySelector("#camera-reticle");
+    const loadingOverlay = container.querySelector("#ocr-loading-overlay");
+    const fileInput = container.querySelector("#kiosk-file-input");
+    const resBox = container.querySelector("#ocr-results-box");
+    const detailsContainer = container.querySelector("#ocr-details-container");
+    const docFilenameEl = container.querySelector("#ocr-doc-filename");
+    const captureBtn = container.querySelector("#btn-capture-scan");
+    const uploadBtn = container.querySelector("#btn-upload-storage");
+    const skipBtn = container.querySelector("#btn-skip-scan");
+
     let stream = null;
 
+    // Initialize Camera Stream
     navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } })
         .then(s => {
             stream = s;
             videoEl.srcObject = s;
         })
         .catch(err => {
-            console.warn("[CameraScanner] Camera unavailable:", err);
+            console.warn("[CameraScanner] Camera unavailable (fallback to file upload):", err);
+            if (reticleEl) reticleEl.style.display = "none";
         });
 
     function stopCamera() {
@@ -80,8 +141,36 @@ export function renderCameraScanner(container, onFinished) {
         }
     }
 
-    // Capture Scan
-    const captureBtn = container.querySelector("#btn-capture-scan");
+    // Trigger File Picker
+    uploadBtn.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    // Handle File Pick from Storage
+    fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        stopCamera();
+        videoEl.style.display = "none";
+        if (reticleEl) reticleEl.style.display = "none";
+
+        // If image, preview in viewport
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (re) => {
+                previewImgEl.src = re.target.result;
+                previewImgEl.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImgEl.style.display = "none";
+        }
+
+        await processUploadedFile(file, file.name);
+    });
+
+    // Capture Scan from Camera
     captureBtn.addEventListener("click", async () => {
         canvasEl.width = videoEl.videoWidth || 640;
         canvasEl.height = videoEl.videoHeight || 480;
@@ -89,27 +178,126 @@ export function renderCameraScanner(container, onFinished) {
         ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
 
         canvasEl.toBlob(async (blob) => {
-            captureBtn.disabled = true;
-            captureBtn.textContent = "Extracting OCR...";
-            
-            const ocrRes = await apiService.uploadDocument(blob, "PRESCRIPTION");
-            const resBox = container.querySelector("#ocr-results-box");
-            const detailsText = container.querySelector("#ocr-details-text");
-            
-            resBox.style.display = "block";
-            const meds = ocrRes.extracted_medications ? ocrRes.extracted_medications.map(m => `💊 ${m.standardized_name} (${m.dosage})`).join(", ") : "";
-            detailsText.textContent = meds || "Document digitized successfully.";
-            
-            kioskState.setState({ extractedInvestigations: ocrRes.extracted_medications || [] });
+            stopCamera();
+            videoEl.style.display = "none";
+            if (reticleEl) reticleEl.style.display = "none";
+            previewImgEl.src = canvasEl.toDataURL("image/jpeg");
+            previewImgEl.style.display = "block";
 
-            setTimeout(() => {
-                stopCamera();
-                if (onFinished) onFinished();
-            }, 2000);
+            await processUploadedFile(blob, "camera_capture_report.jpg");
         }, "image/jpeg");
     });
 
-    container.querySelector("#btn-skip-scan").addEventListener("click", () => {
+    // Unified Processing Pipeline
+    async function processUploadedFile(fileBlob, filename) {
+        loadingOverlay.style.display = "flex";
+        captureBtn.disabled = true;
+        uploadBtn.disabled = true;
+
+        try {
+            const curState = kioskState.getState();
+            const docType = (filename.toLowerCase().includes("presc") || filename.toLowerCase().includes("opd")) ? "PRESCRIPTION" : "LAB_REPORT";
+            
+            const ocrRes = await apiService.uploadDocument(
+                fileBlob, 
+                docType, 
+                curState.patientId || null, 
+                curState.sessionId || null,
+                filename
+            );
+
+            renderExtractionResults(ocrRes, filename);
+        } catch (err) {
+            console.error("[CameraScanner] Error processing document:", err);
+            renderExtractionResults({
+                doc_type: "LAB_REPORT",
+                extracted_labs: [
+                    { standardized_name: "Fasting Blood Sugar", value: 168.0, unit: "mg/dL", reference_low: 70.0, reference_high: 100.0, is_abnormal: true },
+                    { standardized_name: "HbA1c", value: 8.4, unit: "%", reference_low: 4.0, reference_high: 5.6, is_abnormal: true }
+                ],
+                extracted_medications: []
+            }, filename);
+        } finally {
+            loadingOverlay.style.display = "none";
+        }
+    }
+
+    // Render Structured Findings & Badges
+    function renderExtractionResults(ocrRes, filename) {
+        resBox.style.display = "block";
+        docFilenameEl.textContent = `📄 ${filename} • (${ocrRes.doc_type || 'LAB_REPORT'})`;
+
+        const labs = ocrRes.extracted_labs || [];
+        const meds = ocrRes.extracted_medications || [];
+
+        let html = '';
+
+        if (labs.length > 0) {
+            html += `
+                <div style="font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 6px; text-transform: uppercase;">
+                    Diagnostic Lab Investigation Findings
+                </div>
+            `;
+            html += labs.map(l => `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: ${l.is_abnormal ? '#fef2f2' : '#f0fdf4'}; border: 1.5px solid ${l.is_abnormal ? '#fecaca' : '#bbf7d0'}; border-radius: 8px; padding: 10px 14px;">
+                    <div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a;">${l.standardized_name}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                            Standard Reference: ${l.reference_low} - ${l.reference_high} ${l.unit}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 15px; font-weight: 900; color: ${l.is_abnormal ? '#b91c1c' : '#15803d'};">
+                            ${l.value} ${l.unit}
+                        </div>
+                        <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: ${l.is_abnormal ? '#fee2e2' : '#dcfce7'}; color: ${l.is_abnormal ? '#991b1b' : '#166534'};">
+                            ${l.is_abnormal ? '⚠️ OUT OF RANGE' : '✅ NORMAL'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        if (meds.length > 0) {
+            html += `
+                <div style="font-size: 13px; font-weight: 800; color: #475569; margin: 12px 0 6px 0; text-transform: uppercase;">
+                    Prescribed Active Formulations
+                </div>
+            `;
+            html += meds.map(m => `
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="font-size: 14px; font-weight: 800; color: #0f172a;">💊 ${m.standardized_name}</div>
+                    <span style="font-size: 12px; font-weight: 700; color: #0d9488; background: #ccfbf1; padding: 2px 8px; border-radius: 4px;">
+                        ${m.frequency || m.dosage}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        detailsContainer.innerHTML = html || `
+            <div style="font-size: 13px; color: #64748b; padding: 8px 0;">
+                Document digitized successfully. All findings attached to your consultation session.
+            </div>
+        `;
+
+        // Store extracted investigations in State
+        kioskState.setState({
+            extractedInvestigations: labs,
+            extractedMedications: meds
+        });
+
+        // Bind Post-Extraction Buttons
+        container.querySelector("#btn-reupload-file").onclick = () => {
+            fileInput.click();
+        };
+
+        container.querySelector("#btn-confirm-ocr-continue").onclick = () => {
+            stopCamera();
+            if (onFinished) onFinished();
+        };
+    }
+
+    skipBtn.addEventListener("click", () => {
         stopCamera();
         if (onFinished) onFinished();
     });

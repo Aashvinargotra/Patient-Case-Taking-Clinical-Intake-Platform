@@ -16,9 +16,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
 async def upload_medical_document(
-    patient_id: str = Form(...),
-    session_id: str = Form(...),
-    doc_type: str = Form(default="PRESCRIPTION"), # PRESCRIPTION, LAB_REPORT, DISCHARGE_SUMMARY
+    patient_id: Optional[str] = Form(default=None),
+    session_id: Optional[str] = Form(default=None),
+    doc_type: Optional[str] = Form(default="LAB_REPORT"), # PRESCRIPTION, LAB_REPORT, DISCHARGE_SUMMARY
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db)
 ):
@@ -26,10 +26,31 @@ async def upload_medical_document(
     Receives uploaded prescription or lab report image, performs OCR entity extraction,
     extracts medicines and lab reference intervals, and stores structured records.
     """
-    # Verify patient & session
-    p_row = (await db.execute(select(patients).where(patients.c.patient_id == patient_id))).fetchone()
+    # Verify or provision patient & session
+    pid = patient_id or f"PAT-WALK-{str(uuid.uuid4())[:6].upper()}"
+    sid = session_id or str(uuid.uuid4())
+
+    p_row = (await db.execute(select(patients).where(patients.c.patient_id == pid))).fetchone()
     if not p_row:
-        raise HTTPException(status_code=404, detail="Patient not found")
+        await db.execute(patients.insert().values(
+            patient_id=pid,
+            full_name="Walk-in Patient",
+            gender="MALE",
+            birth_year=1990,
+            is_temporary=True
+        ))
+        await db.flush()
+
+    s_row = (await db.execute(select(visit_sessions).where(visit_sessions.c.session_id == sid))).fetchone()
+    if not s_row:
+        await db.execute(visit_sessions.insert().values(
+            session_id=sid,
+            patient_id=pid,
+            intake_language="hi",
+            status="IN_PROGRESS",
+            intake_channel="KIOSK"
+        ))
+        await db.flush()
 
     file_bytes = await file.read()
     doc_id = str(uuid.uuid4())
@@ -46,17 +67,17 @@ async def upload_medical_document(
     # Insert document record
     await db.execute(medical_documents.insert().values(
         doc_id=doc_id,
-        patient_id=patient_id,
-        session_id=session_id,
+        patient_id=pid,
+        session_id=sid,
         original_filename=file.filename,
         file_path=file_path,
-        doc_type=doc_type.upper(),
+        doc_type=(doc_type or "LAB_REPORT").upper(),
         mime_type=file.content_type or "image/jpeg",
         processing_status="PROCESSED"
     ))
 
     # Run OCR & Entity Extraction Pipeline
-    ocr_result = await extract_document_entities(file_bytes, file.filename, doc_type=doc_type)
+    ocr_result = await extract_document_entities(file_bytes, file.filename, doc_type=doc_type or "LAB_REPORT")
 
     extracted_records = []
 
