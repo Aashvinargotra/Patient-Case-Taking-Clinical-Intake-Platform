@@ -5,7 +5,6 @@
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { getTranslation } from "../config.js";
-import { icon } from "../icons.js";
 
 export function renderBodyMapPicker(container, onAreaSelected) {
     const state = kioskState.getState();
@@ -15,7 +14,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
     const bodyAreas = [
         {
             id: "chest",
-            icon: "heart",
+            icon: "🫀",
             names: {
                 hi: "छाती / हृदय",
                 pa: "ਛਾਤੀ / ਦਿਲ",
@@ -29,7 +28,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "head",
-            icon: "user",
+            icon: "🧠",
             names: {
                 hi: "सिर / मस्तिष्क",
                 pa: "ਸਿਰ / ਦਿਮਾਗ਼",
@@ -43,7 +42,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "abdomen",
-            icon: "activity",
+            icon: "🤢",
             names: {
                 hi: "पेट / नाभि",
                 pa: "ਢਿੱਡ / ਨਾਭੀ",
@@ -57,7 +56,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "knee",
-            icon: "activity",
+            icon: "🦵",
             names: {
                 hi: "घुटने / जोड़",
                 pa: "ਗੋਡੇ / ਜੋੜ",
@@ -71,7 +70,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "back",
-            icon: "activity",
+            icon: "🦴",
             names: {
                 hi: "कमर / रीढ़",
                 pa: "ਲੱਕ / ਰੀੜ੍ਹ",
@@ -85,7 +84,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "throat",
-            icon: "volume-2",
+            icon: "🗣️",
             names: {
                 hi: "गला / गर्दन",
                 pa: "ਗਲਾ / ਗਰਦਨ",
@@ -99,7 +98,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "arms",
-            icon: "activity",
+            icon: "💪",
             names: {
                 hi: "हाथ / बांह",
                 pa: "ਹੱਥ / ਬਾਹਾਂ",
@@ -113,7 +112,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "skin",
-            icon: "shield",
+            icon: "🩹",
             names: {
                 hi: "त्वचा / एलर्जी",
                 pa: "ਚਮੜੀ / ਐਲਰਜੀ",
@@ -127,7 +126,7 @@ export function renderBodyMapPicker(container, onAreaSelected) {
         },
         {
             id: "general",
-            icon: "help-circle",
+            icon: "❓",
             names: {
                 hi: "पक्का नहीं / पूरे शरीर में बेचैनी",
                 pa: "ਪੱਕਾ ਨਹੀਂ / ਸਾਰੇ ਸਰੀਰ 'ਚ ਤਕਲੀਫ਼",
@@ -136,37 +135,6 @@ export function renderBodyMapPicker(container, onAreaSelected) {
                 te: "ఖచ్చితంగా తెలియదు / మొత్తం శరీరం అసౌకర్యం",
                 mr: "नक्की नाही / अंगदुखी किंवा अशक्तपणा",
                 gu: "ખાતરી નથી / આખા શરીરમાં અસ્વસ્થતા",
-                en: "Not Sure / Whole Body Discomfort"
-            }
-        }
-    ];
-
-    container.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; margin: auto; animation: fade-in 250ms ease;">
-            
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">
-                    ${t.bodyMapTitle || 'Select Affected Body Region'}
-                </h2>
-                <p style="font-size: var(--font-size-base); color: var(--text-secondary);">
-                    ${t.bodyMapSub || 'Tap on the anatomical region where you feel pain, discomfort, or symptoms.'}
-                </p>
-            </div>
-
-            <!-- Body Map Interactive Grid -->
-            <div class="chip-grid" style="max-width: 820px; margin-bottom: 24px;">
-                ${bodyAreas.map(area => {
-                    const areaName = area.names[lang] || area.names.hi;
-                    return `
-                        <button class="touch-chip" data-area-id="${area.id}" data-area-name="${areaName}" aria-label="${areaName}" style="display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px;">
-                            <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #f0fdfa;">
-                                ${icon(area.icon, { size: 18, color: '#0d9488' })}
-                            </span>
-                            <span style="font-weight: 700; font-size: 14.5px;">${areaName}</span>
-                        </button>
-                    `;
-                }).join('')}
-            </div>�રમાં અસ્વસ્થતા",
                 en: "Not Sure / Whole Body Discomfort"
             }
         }

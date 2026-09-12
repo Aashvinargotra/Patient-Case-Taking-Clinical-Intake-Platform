@@ -4,7 +4,6 @@
 import { CONFIG, getTranslation } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
-import { getIcon } from "../icons.js";
 
 export function renderHeaderBar(container, onLanguageChanged = null) {
     const state = kioskState.getState();
@@ -21,9 +20,7 @@ export function renderHeaderBar(container, onLanguageChanged = null) {
     container.innerHTML = `
         <header class="kiosk-header" role="banner">
             <div class="kiosk-branding">
-                <div class="kiosk-logo-badge" aria-hidden="true" style="display: flex; align-items: center; justify-content: center;">
-                    ${getIcon('hospital', { size: 24, color: '#0d9488' })}
-                </div>
+                <div class="kiosk-logo-badge" aria-hidden="true">🏥</div>
                 <div class="kiosk-title-group">
                     <h1>${t.appName}</h1>
                     <p>${t.hospitalName}</p>
@@ -34,14 +31,14 @@ export function renderHeaderBar(container, onLanguageChanged = null) {
                 <div class="clock-badge" id="live-clock" aria-label="Current Time">--:--:--</div>
                 
                 <!-- Language Selector -->
-                <button class="header-btn active" id="btn-language" aria-label="Change Language. Current is ${currentLangObj.name}" style="font-weight: 800; border-color: #0d9488; display: inline-flex; align-items: center; gap: 6px;">
-                    <span style="display: flex; align-items: center;">${getIcon('globe', { size: 16, color: '#0d9488' })}</span>
+                <button class="header-btn active" id="btn-language" aria-label="Change Language. Current is ${currentLangObj.name}" style="font-weight: 800; border-color: #0d9488;">
+                    <span>🌐</span>
                     <span>${currentLangObj.name} (${currentLangObj.code.toUpperCase()})</span>
                 </button>
 
                 <!-- High Contrast Toggle -->
-                <button class="header-btn ${state.highContrastMode ? 'active' : ''}" id="btn-contrast" aria-label="Toggle High Contrast Mode" style="display: inline-flex; align-items: center; gap: 6px;">
-                    <span style="display: flex; align-items: center;">${getIcon('eye', { size: 16, color: 'currentColor' })}</span>
+                <button class="header-btn ${state.highContrastMode ? 'active' : ''}" id="btn-contrast" aria-label="Toggle High Contrast Mode">
+                    <span>👁️</span>
                     <span>${t.contrast}</span>
                 </button>
 
@@ -59,8 +56,8 @@ export function renderHeaderBar(container, onLanguageChanged = null) {
                 </div>
 
                 <!-- Audio Mute Toggle -->
-                <button class="header-btn ${state.audioMuted ? 'active' : ''}" id="btn-audio-mute" aria-label="Toggle Audio Sound" style="display: inline-flex; align-items: center; gap: 6px;">
-                    <span style="display: flex; align-items: center;">${state.audioMuted ? getIcon('volume-x', { size: 16, color: 'currentColor' }) : getIcon('volume-2', { size: 16, color: 'currentColor' })}</span>
+                <button class="header-btn ${state.audioMuted ? 'active' : ''}" id="btn-audio-mute" aria-label="Toggle Audio Sound">
+                    <span>${state.audioMuted ? '🔇' : '🔊'}</span>
                     <span>${state.audioMuted ? t.soundOff : t.soundOn}</span>
                 </button>
             </div>
@@ -124,13 +121,8 @@ export function renderHeaderBar(container, onLanguageChanged = null) {
         modal.innerHTML = `
             <div class="modal-dialog" style="max-width: 540px;">
                 <div class="modal-header">
-                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-                        ${getIcon('globe', { size: 20, color: '#0d9488' })}
-                        <span>Select Language / भाषा चुनें</span>
-                    </h3>
-                    <button id="btn-close-lang-modal" style="background: none; border: none; padding: 4px; cursor: pointer; color: #64748b; display: flex; align-items: center;">
-                        ${getIcon('x', { size: 18, color: '#64748b' })}
-                    </button>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">🌐 Select Language / भाषा चुनें</h3>
+                    <button id="btn-close-lang-modal" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #64748b;">✕</button>
                 </div>
                 <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
                     ${CONFIG.LANGUAGES.map(l => `

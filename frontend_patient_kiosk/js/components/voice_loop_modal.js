@@ -10,7 +10,6 @@ import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { apiService } from "../api_service.js";
 import { getTranslation } from "../config.js";
-import { getIcon } from "../icons.js";
 
 export function renderVoiceLoop(container, onCompleteIntake) {
     const state = kioskState.getState();
@@ -420,9 +419,7 @@ export function renderVoiceLoop(container, onCompleteIntake) {
                     <div style="display: inline-flex; align-items: center; gap: 8px; background: #f0fdfa; border: 1px solid #99f6e4; color: #0d9488; font-size: 13px; font-weight: 800; padding: 4px 16px; border-radius: 9999px; text-transform: uppercase;">
                         <span>${t.stepLabel || 'Step'} ${currentStepIdx + 1} ${t.ofLabel || 'of'} ${steps.length}</span>
                         <span>•</span>
-                        <span style="display: inline-flex; align-items: center; gap: 5px;">
-                            ${isAyush ? `${getIcon('leaf', { size: 14, color: '#0d9488' })} AYUSH Dashavidha Pariksha` : `${getIcon('stethoscope', { size: 14, color: '#0d9488' })} Modern Medicine SOCRATES`}
-                        </span>
+                        <span>${isAyush ? (t.ayushBadge || '🌿 AYUSH Dashavidha Pariksha') : (t.allopathyBadge || '🩺 Modern Medicine SOCRATES')}</span>
                     </div>
                     <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: #0f172a; margin-top: 10px;">
                         ${stepTitle}
@@ -431,8 +428,8 @@ export function renderVoiceLoop(container, onCompleteIntake) {
 
                 <!-- Voice Turn-Taking Pulse Sphere -->
                 <div class="voice-sphere-container">
-                    <div class="voice-sphere" id="mic-sphere" role="button" tabindex="0" aria-label="Microphone sphere. Tap to speak." style="display: flex; align-items: center; justify-content: center;">
-                        ${getIcon('mic', { size: 36, color: '#ffffff' })}
+                    <div class="voice-sphere" id="mic-sphere" role="button" tabindex="0" aria-label="Microphone sphere. Tap to speak.">
+                        🎙️
                     </div>
                     <div class="audio-waveform" id="waveform-container">
                         <div class="waveform-bar" style="height: 12px;"></div>
@@ -450,8 +447,7 @@ export function renderVoiceLoop(container, onCompleteIntake) {
                 <div class="live-speech-box" id="live-speech-container">
                     <div class="live-speech-header">
                         <span style="font-size: 13px; font-weight: 700; color: #64748b; display: flex; align-items: center; gap: 6px;">
-                            ${getIcon('mic', { size: 14, color: '#0d9488' })}
-                            <span>${t.liveStreaming || 'Live Vernacular Speech Recognition'} (${lang.toUpperCase()})</span>
+                            💬 ${t.liveStreaming || 'Live Vernacular Speech Recognition'} (${lang.toUpperCase()})
                         </span>
                         <span class="live-indicator-badge" id="live-indicator" style="display: none;">
                             <span class="live-dot"></span> ${t.liveStreaming || 'LIVE STREAMING'}
@@ -463,12 +459,11 @@ export function renderVoiceLoop(container, onCompleteIntake) {
                     <div class="live-translation-text" id="live-translation-display" style="display: none;"></div>
                 </div>
 
+
                 <!-- Custom Freeform Typing Input Bar -->
                 <div style="width: 100%; max-width: 800px; margin: 8px 0 16px 0;">
                     <div style="display: flex; gap: 8px; align-items: center; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 6px 10px; box-shadow: 0 2px 6px rgba(15,23,42,0.05);">
-                        <span style="color: #64748b; display: flex; align-items: center; padding-left: 4px;">
-                            ${getIcon('edit-3', { size: 18, color: '#64748b' })}
-                        </span>
+                        <span style="font-size: 20px; color: #64748b; padding-left: 4px;">⌨️</span>
                         <input type="text" id="input-custom-text-answer" 
                                placeholder="${{
                                    hi: 'या यहाँ अपनी तकलीफ़ लिखकर दर्ज करें...',
@@ -483,23 +478,21 @@ export function renderVoiceLoop(container, onCompleteIntake) {
                                value="${(state.slots && state.slots[step.key]) || ''}"
                                style="flex: 1; border: none; outline: none; font-size: 14.5px; font-weight: 600; color: #0f172a; background: transparent; padding: 6px 4px;" />
                         <button type="button" id="btn-submit-typed-answer" class="btn btn-primary" 
-                                style="padding: 9px 18px; font-size: 13.5px; font-weight: 800; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
-                            <span>${{
-                                hi: 'दर्ज करें',
-                                pa: 'ਦਰਜ ਕਰੋ',
-                                bn: 'জমা দিন',
-                                ta: 'சமர்ப்பி',
-                                te: 'సమర్పించు',
-                                mr: 'नोंदवा',
-                                gu: 'સબમિટ',
-                                en: 'Submit'
-                            }[lang] || 'Submit'}</span>
-                            ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                                style="padding: 9px 18px; font-size: 13.5px; font-weight: 800; border-radius: 6px; white-space: nowrap;">
+                            ${{
+                                hi: 'दर्ज करें ➔',
+                                pa: 'ਦਰਜ ਕਰੋ ➔',
+                                bn: 'জমা দিন ➔',
+                                ta: 'சமர்ப்பி ➔',
+                                te: 'సమర్పించు ➔',
+                                mr: 'नोंदवा ➔',
+                                gu: 'સબમિટ ➔',
+                                en: 'Submit ➔'
+                            }[lang] || 'Submit ➔'}
                         </button>
                     </div>
-                    <div style="font-size: 11.5px; color: #64748b; margin-top: 4px; padding-left: 8px; display: flex; align-items: center; gap: 6px;">
-                        ${getIcon('help-circle', { size: 13, color: '#0d9488' })}
-                        <em>Tip: You can speak into the mic, tap any chip below, or type in your own words.</em>
+                    <div style="font-size: 11.5px; color: #64748b; margin-top: 4px; padding-left: 8px;">
+                        💡 <em>Tip: You can speak into the mic, tap any chip below, or type in your own words.</em>
                     </div>
                 </div>
 
@@ -514,17 +507,14 @@ export function renderVoiceLoop(container, onCompleteIntake) {
 
                 <!-- Navigation Controls -->
                 <div style="display: flex; justify-content: space-between; width: 100%; max-width: 800px; margin-top: 24px;">
-                    <button class="header-btn" id="btn-prev-step" ${currentStepIdx === 0 ? 'disabled style="opacity: 0.4;"' : ''} style="display: inline-flex; align-items: center; gap: 6px;">
-                        ${getIcon('arrow-left', { size: 14, color: 'currentColor' })}
-                        <span>${t.prevBtn || 'Previous'}</span>
+                    <button class="header-btn" id="btn-prev-step" ${currentStepIdx === 0 ? 'disabled style="opacity: 0.4;"' : ''}>
+                        ${t.prevBtn || '⬅️ Previous'}
                     </button>
-                    <button class="header-btn" id="btn-replay-audio" style="background: #f8fafc; border-color: #cbd5e1; display: inline-flex; align-items: center; gap: 6px;">
-                        ${getIcon('volume-2', { size: 14, color: 'currentColor' })}
-                        <span>${t.repeatQuestion || 'Repeat Question'}</span>
+                    <button class="header-btn" id="btn-replay-audio" style="background: #f8fafc; border-color: #cbd5e1;">
+                        🔊 ${t.repeatQuestion || 'Repeat Question'}
                     </button>
-                    <button class="header-btn active" id="btn-next-step" style="padding: 0 32px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-                        <span>${currentStepIdx === steps.length - 1 ? (t.confirmBtn || 'Confirm & Proceed') : (t.nextBtn || 'Next')}</span>
-                        ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                    <button class="header-btn active" id="btn-next-step" style="padding: 0 32px; font-weight: 800;">
+                        ${currentStepIdx === steps.length - 1 ? (t.confirmBtn || 'Confirm & Proceed ➔') : (t.nextBtn || 'Next ➔')}
                     </button>
                 </div>
 

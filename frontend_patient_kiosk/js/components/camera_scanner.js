@@ -6,7 +6,6 @@ import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { apiService } from "../api_service.js";
 import { getTranslation } from "../config.js";
-import { getIcon } from "../icons.js";
 
 export function renderCameraScanner(container, onFinished) {
     const state = kioskState.getState();
@@ -24,15 +23,15 @@ export function renderCameraScanner(container, onFinished) {
                     ${t.ocrTitle || 'Scan or Upload Lab Report / Prescription (Optional)'}
                 </h2>
                 <p style="font-size: var(--font-size-base); color: var(--text-secondary); max-width: 700px; margin: auto;">
-                    ${t.ocrSub || 'Hold your printed report to the camera or upload from storage. Our clinical AI extracts biomarkers, flags out-of-range results, and links them to the doctor queue.'}
+                    Upload prior blood tests, diagnostic investigations, or prescription slips. Out-of-range lab results are automatically flagged for the doctor.
                 </p>
             </div>
 
-            <!-- Viewport Container for Camera / Upload Preview -->
-            <div id="scanner-viewport-box" style="position: relative; width: 100%; max-width: 640px; height: 340px; background: #0f172a; border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid #cbd5e1; box-shadow: 0 8px 24px rgba(15,23,42,0.12);">
+            <!-- Viewport Container (Camera Stream OR Uploaded Image Preview) -->
+            <div id="scanner-viewport-box" style="width: 100%; max-width: 640px; height: 340px; background: #0f172a; border-radius: var(--radius-lg); border: 2.5px solid #0d9488; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);">
                 
                 <!-- Live Video Feed -->
-                <video id="kiosk-cam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+                <video id="kiosk-cam-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
                 <canvas id="kiosk-cam-canvas" style="display: none;"></canvas>
                 
                 <!-- Uploaded Document Preview Image -->
@@ -40,17 +39,14 @@ export function renderCameraScanner(container, onFinished) {
 
                 <!-- Reticle Overlay for Camera -->
                 <div id="camera-reticle" style="position: absolute; width: 85%; height: 80%; border: 2px dashed rgba(56, 189, 248, 0.7); border-radius: var(--radius-md); pointer-events: none; display: flex; align-items: center; justify-content: center;">
-                    <span style="background: rgba(15,23,42,0.75); padding: 6px 16px; border-radius: 9999px; font-size: 13px; font-weight: 700; color: #38bdf8; display: inline-flex; align-items: center; gap: 6px;">
-                        ${getIcon('camera', { size: 14, color: '#38bdf8' })}
-                        <span>Hold Report Here OR Upload File</span>
+                    <span style="background: rgba(15,23,42,0.75); padding: 6px 16px; border-radius: 9999px; font-size: 13px; font-weight: 700; color: #38bdf8;">
+                        📸 Hold Report Here OR Upload File
                     </span>
                 </div>
 
                 <!-- Processing Overlay -->
                 <div id="ocr-loading-overlay" style="position: absolute; inset: 0; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 10;">
-                    <div style="display: flex; align-items: center; justify-content: center;">
-                        ${getIcon('flask', { size: 40, color: '#38bdf8' })}
-                    </div>
+                    <div style="font-size: 38px; animation: pulse 1s infinite;">🔬</div>
                     <div style="color: #ffffff; font-weight: 800; font-size: 16px;">Scanning & Analyzing Lab Reference Intervals...</div>
                     <div style="color: #94a3b8; font-size: 13px;">Checking biological normal limits & NLEM drug database</div>
                 </div>
@@ -64,13 +60,11 @@ export function renderCameraScanner(container, onFinished) {
                 <button class="access-btn" id="btn-skip-scan" style="flex: 1; min-width: 140px; justify-content: center; height: 48px;">
                     ${t.skipOcr || 'Skip (No Reports)'}
                 </button>
-                <button class="header-btn" id="btn-upload-storage" style="flex: 1.2; min-width: 200px; justify-content: center; height: 48px; font-size: 14px; background: #f0fdfa; border: 1.5px solid #0d9488; color: #0f766e; font-weight: 800; display: inline-flex; align-items: center; gap: 8px;">
-                    ${getIcon('folder-up', { size: 16, color: '#0d9488' })}
-                    <span>Upload from Storage</span>
+                <button class="header-btn" id="btn-upload-storage" style="flex: 1.2; min-width: 200px; justify-content: center; height: 48px; font-size: 14px; background: #f0fdfa; border: 1.5px solid #0d9488; color: #0f766e; font-weight: 800;">
+                    📁 Upload from Storage
                 </button>
-                <button class="header-btn active" id="btn-capture-scan" style="flex: 1.2; min-width: 180px; justify-content: center; height: 48px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px;">
-                    ${getIcon('camera', { size: 16, color: '#ffffff' })}
-                    <span>Capture & Extract</span>
+                <button class="header-btn active" id="btn-capture-scan" style="flex: 1.2; min-width: 180px; justify-content: center; height: 48px; font-size: 14px; font-weight: 800;">
+                    📸 Capture & Extract
                 </button>
             </div>
 
@@ -79,9 +73,8 @@ export function renderCameraScanner(container, onFinished) {
                 
                 <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 14px;">
                     <div>
-                        <h4 style="color: #0f172a; font-size: 16px; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 6px;">
-                            ${getIcon('check-circle', { size: 18, color: '#15803d' })}
-                            <span>AI Document Extraction Results</span>
+                        <h4 style="color: #0f172a; font-size: 16px; font-weight: 800; margin: 0;">
+                            ✅ AI Document Extraction Results
                         </h4>
                         <span id="ocr-doc-filename" style="font-size: 12px; color: #64748b; font-weight: 600;"></span>
                     </div>
@@ -96,13 +89,11 @@ export function renderCameraScanner(container, onFinished) {
 
                 <!-- Post-Extraction Confirmation Actions -->
                 <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1.5px solid #f1f5f9; padding-top: 16px;">
-                    <button id="btn-reupload-file" class="access-btn" style="flex: 1; justify-content: center; height: 46px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
-                        ${getIcon('refresh-cw', { size: 14, color: 'currentColor' })}
-                        <span>Choose Another File</span>
+                    <button id="btn-reupload-file" class="access-btn" style="flex: 1; justify-content: center; height: 46px; font-size: 13px;">
+                        🔄 Choose Another File
                     </button>
-                    <button id="btn-confirm-ocr-continue" class="header-btn active" style="flex: 1.5; justify-content: center; height: 46px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-                        <span>Confirm & Continue</span>
-                        ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                    <button id="btn-confirm-ocr-continue" class="header-btn active" style="flex: 1.5; justify-content: center; height: 46px; font-size: 14px; font-weight: 800;">
+                        Confirm & Continue ➔
                     </button>
                 </div>
             </div>
@@ -234,7 +225,7 @@ export function renderCameraScanner(container, onFinished) {
     // Render Structured Findings & Badges
     function renderExtractionResults(ocrRes, filename) {
         resBox.style.display = "block";
-        docFilenameEl.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px;">${getIcon('file-text', { size: 13, color: '#64748b' })} ${filename} • (${ocrRes.doc_type || 'LAB_REPORT'})</span>`;
+        docFilenameEl.textContent = `📄 ${filename} • (${ocrRes.doc_type || 'LAB_REPORT'})`;
 
         const labs = ocrRes.extracted_labs || [];
         const meds = ocrRes.extracted_medications || [];
@@ -259,8 +250,8 @@ export function renderCameraScanner(container, onFinished) {
                         <div style="font-size: 15px; font-weight: 900; color: ${l.is_abnormal ? '#b91c1c' : '#15803d'};">
                             ${l.value} ${l.unit}
                         </div>
-                        <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: ${l.is_abnormal ? '#fee2e2' : '#dcfce7'}; color: ${l.is_abnormal ? '#991b1b' : '#166534'}; display: inline-flex; align-items: center; gap: 4px;">
-                            ${l.is_abnormal ? `${getIcon('alert-triangle', { size: 11, color: '#991b1b' })} OUT OF RANGE` : `${getIcon('check', { size: 11, color: '#166534' })} NORMAL`}
+                        <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: ${l.is_abnormal ? '#fee2e2' : '#dcfce7'}; color: ${l.is_abnormal ? '#991b1b' : '#166534'};">
+                            ${l.is_abnormal ? '⚠️ OUT OF RANGE' : '✅ NORMAL'}
                         </span>
                     </div>
                 </div>
@@ -275,10 +266,7 @@ export function renderCameraScanner(container, onFinished) {
             `;
             html += meds.map(m => `
                 <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 14px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-                        ${getIcon('pill', { size: 14, color: '#0d9488' })}
-                        <span>${m.standardized_name}</span>
-                    </div>
+                    <div style="font-size: 14px; font-weight: 800; color: #0f172a;">💊 ${m.standardized_name}</div>
                     <span style="font-size: 12px; font-weight: 700; color: #0d9488; background: #ccfbf1; padding: 2px 8px; border-radius: 4px;">
                         ${m.frequency || m.dosage}
                     </span>

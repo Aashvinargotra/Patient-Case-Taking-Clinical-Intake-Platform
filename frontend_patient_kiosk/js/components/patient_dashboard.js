@@ -6,7 +6,6 @@
 import { kioskState } from "../state.js";
 import { apiService } from "../api_service.js";
 import { getTranslation } from "../config.js";
-import { getIcon } from "../icons.js";
 
 // Comprehensive Default Clinical Consultations for Demo Accounts
 const DEFAULT_PATIENT_CONSULTATIONS = {
@@ -153,17 +152,16 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
             <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: 0 4px 16px rgba(15,23,42,0.05); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
                 
                 <div style="display: flex; align-items: center; gap: 18px;">
-                    <div style="width: 68px; height: 68px; border-radius: 50%; background: #f0fdfa; border: 2.5px solid #0d9488; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
-                        ${getIcon('user', { size: 34, color: '#0d9488' })}
+                    <div style="width: 68px; height: 68px; border-radius: 50%; background: #f0fdfa; border: 2.5px solid #0d9488; display: flex; align-items: center; justify-content: center; font-size: 34px; box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
+                        ${gender === 'Female' ? '👩' : '👨'}
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <h2 style="font-size: 24px; font-weight: 900; color: #0f172a; margin: 0;">
                                 ${patientName}
                             </h2>
-                            <span class="badge badge-green" style="font-size: 11px; padding: 4px 10px; background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; border-radius: 9999px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
-                                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                                ABDM Verified ABHA
+                            <span class="badge badge-green" style="font-size: 11px; padding: 4px 10px; background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7; border-radius: 9999px; font-weight: 800;">
+                                🟢 ABDM Verified ABHA
                             </span>
                         </div>
                         <div style="font-size: 13.5px; color: #475569; margin-top: 5px; font-weight: 600; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
@@ -180,14 +178,11 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
 
                 <!-- Primary Action Buttons -->
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                    <button class="access-btn" id="btn-patient-logout" style="padding: 10px 18px; font-size: 13.5px; font-weight: 700; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #475569; display: inline-flex; align-items: center; gap: 6px;">
-                        ${getIcon('log-out', { size: 14, color: '#475569' })}
-                        <span>Sign Out</span>
+                    <button class="access-btn" id="btn-patient-logout" style="padding: 10px 18px; font-size: 13.5px; font-weight: 700; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #475569;">
+                        🚪 Sign Out
                     </button>
-                    <button class="header-btn active" id="btn-start-new-intake" style="padding: 12px 24px; font-size: 14.5px; font-weight: 800; box-shadow: 0 4px 14px rgba(13,148,136,0.25); display: inline-flex; align-items: center; gap: 8px;">
-                        ${getIcon('clipboard-list', { size: 16, color: '#ffffff' })}
-                        <span>Start New OPD Intake & Token</span>
-                        ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                    <button class="header-btn active" id="btn-start-new-intake" style="padding: 12px 24px; font-size: 14.5px; font-weight: 800; box-shadow: 0 4px 14px rgba(13,148,136,0.25);">
+                        🏥 Start New OPD Intake & Token ➔
                     </button>
                 </div>
 
@@ -222,13 +217,11 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
 
             <!-- Navigation Tabs: Consultations vs Upload Labs -->
             <div style="display: flex; gap: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 2px;">
-                <button class="tab-btn active" id="tab-btn-consultations" style="background: none; border: none; font-size: 16px; font-weight: 800; color: #0d9488; padding: 10px 20px; border-bottom: 3px solid #0d9488; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                    ${getIcon('clipboard-list', { size: 16, color: 'currentColor' })}
-                    <span>Past OPD Consultations & Prescriptions (${consultations.length})</span>
+                <button class="tab-btn active" id="tab-btn-consultations" style="background: none; border: none; font-size: 16px; font-weight: 800; color: #0d9488; padding: 10px 20px; border-bottom: 3px solid #0d9488; cursor: pointer;">
+                    📋 Past OPD Consultations & Prescriptions (${consultations.length})
                 </button>
-                <button class="tab-btn" id="tab-btn-labs" style="background: none; border: none; font-size: 16px; font-weight: 700; color: #64748b; padding: 10px 20px; border-bottom: 3px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                    ${getIcon('flask', { size: 16, color: 'currentColor' })}
-                    <span>Upload & View Lab Reports (${labReports.length})</span>
+                <button class="tab-btn" id="tab-btn-labs" style="background: none; border: none; font-size: 16px; font-weight: 700; color: #64748b; padding: 10px 20px; border-bottom: 3px solid transparent; cursor: pointer;">
+                    🔬 Upload & View Lab Reports (${labReports.length})
                 </button>
             </div>
 
@@ -236,16 +229,13 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
             <div id="section-consultations" style="display: flex; flex-direction: column; gap: 18px;">
                 ${consultations.length === 0 ? `
                     <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 48px 24px; text-align: center; color: #64748b;">
-                        <div style="display: flex; justify-content: center; margin-bottom: 12px;">
-                            ${getIcon('stethoscope', { size: 42, color: '#94a3b8' })}
-                        </div>
+                        <div style="font-size: 40px; margin-bottom: 12px;">🩺</div>
                         <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Past Consultations on Record</h3>
                         <p style="font-size: 14px; max-width: 480px; margin: auto; margin-bottom: 20px;">
                             You haven't completed an OPD consultation yet. Click below to start your clinical intake and receive a digital token.
                         </p>
-                        <button class="header-btn active" id="btn-empty-start-intake" style="padding: 10px 22px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
-                            <span>Start First OPD Consultation</span>
-                            ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                        <button class="header-btn active" id="btn-empty-start-intake" style="padding: 10px 22px; font-size: 14px;">
+                            Start First OPD Consultation ➔
                         </button>
                     </div>
                 ` : consultations.map(c => `
@@ -254,9 +244,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                         <!-- Card Header -->
                         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 40px; height: 40px; border-radius: 8px; background: #f0fdfa; border: 1px solid #99f6e4; display: flex; align-items: center; justify-content: center;">
-                                    ${getIcon('stethoscope', { size: 20, color: '#0d9488' })}
-                                </div>
+                                <span style="font-size: 24px;">👨‍⚕️</span>
                                 <div>
                                     <div style="font-size: 16.5px; font-weight: 800; color: #0f172a;">
                                         ${c.doctor || 'Attending Physician'}
@@ -267,13 +255,11 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                                 </div>
                             </div>
                             <div style="text-align: right;">
-                                <span style="font-size: 13px; font-weight: 800; color: #1e293b; background: #f1f5f9; padding: 4px 12px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px;">
-                                    ${getIcon('calendar', { size: 13, color: '#1e293b' })}
-                                    <span>${c.date || 'Recent'}</span>
+                                <span style="font-size: 13px; font-weight: 800; color: #1e293b; background: #f1f5f9; padding: 4px 12px; border-radius: 9999px;">
+                                    📅 ${c.date || 'Recent'}
                                 </span>
-                                <div style="font-size: 11px; font-weight: 700; color: #15803d; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
-                                    ${getIcon('check-circle', { size: 12, color: '#15803d' })}
-                                    <span>Clinically Verified & Signed</span>
+                                <div style="font-size: 11px; font-weight: 700; color: #15803d; margin-top: 4px;">
+                                    ✅ Clinically Verified & Signed
                                 </div>
                             </div>
                         </div>
@@ -305,7 +291,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                         <!-- Prescribed Medications & Dosages Table -->
                         <div>
                             <div style="font-size: 12.5px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                ${getIcon('pill', { size: 16, color: '#0d9488' })}
+                                <span>💊</span>
                                 <span>Prescribed Medications & Dosage Regimen</span>
                             </div>
 
@@ -357,8 +343,8 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                 <!-- Direct Storage Uploader Box -->
                 <div style="background: #ffffff; border: 2px dashed #0d9488; border-radius: var(--radius-lg); padding: 32px 24px; text-align: center; box-shadow: 0 4px 14px rgba(13,148,136,0.06); background: #f0fdfa;">
                     
-                    <div style="width: 60px; height: 60px; background: #ccfbf1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto;">
-                        ${getIcon('folder-up', { size: 30, color: '#0d9488' })}
+                    <div style="width: 60px; height: 60px; background: #ccfbf1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px auto;">
+                        📁
                     </div>
 
                     <h3 style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0 0 6px 0;">
@@ -372,9 +358,8 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                     <input type="file" id="input-direct-lab-upload" accept="image/*,application/pdf" style="display: none;" />
                     
                     <div style="display: flex; justify-content: center; gap: 12px;">
-                        <button class="header-btn active" id="btn-trigger-lab-file" style="padding: 12px 28px; font-size: 14.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px;">
-                            ${getIcon('upload', { size: 16, color: '#ffffff' })}
-                            <span>Browse Storage & Upload File</span>
+                        <button class="header-btn active" id="btn-trigger-lab-file" style="padding: 12px 28px; font-size: 14.5px; font-weight: 800;">
+                            📂 Browse Storage & Upload File
                         </button>
                     </div>
 
@@ -385,7 +370,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                 <!-- List of Previously Uploaded Lab Reports -->
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-                        ${getIcon('flask', { size: 18, color: '#0d9488' })}
+                        <span>🔬</span>
                         <span>My Uploaded Diagnostic Documents (${labReports.length})</span>
                     </h3>
 
@@ -398,9 +383,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                             
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="display: flex; align-items: center;">
-                                        ${getIcon('file-text', { size: 22, color: '#0284c7' })}
-                                    </div>
+                                    <span style="font-size: 22px;">📄</span>
                                     <div>
                                         <div style="font-size: 15px; font-weight: 800; color: #0f172a;">
                                             ${lab.filename || 'Diagnostic_Investigation_Report.pdf'}
@@ -425,8 +408,8 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                                             <div style="font-size: 14.5px; font-weight: 900; color: ${l.is_abnormal ? '#b91c1c' : '#15803d'};">
                                                 ${l.value} ${l.unit}
                                             </div>
-                                            <span style="font-size: 10.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${l.is_abnormal ? '#fee2e2' : '#dcfce7'}; color: ${l.is_abnormal ? '#991b1b' : '#166534'}; display: inline-flex; align-items: center; gap: 4px;">
-                                                ${l.is_abnormal ? `${getIcon('alert-triangle', { size: 11, color: '#991b1b' })} OUT OF RANGE` : `${getIcon('check', { size: 11, color: '#166534' })} NORMAL`}
+                                            <span style="font-size: 10.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${l.is_abnormal ? '#fee2e2' : '#dcfce7'}; color: ${l.is_abnormal ? '#991b1b' : '#166534'};">
+                                                ${l.is_abnormal ? '⚠️ OUT OF RANGE' : '✅ NORMAL'}
                                             </span>
                                         </div>
                                     </div>
@@ -497,12 +480,12 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
             if (!file) return;
 
             triggerBtn.disabled = true;
-            triggerBtn.innerHTML = `<span>Scanning Document & Extracting Values...</span>`;
+            triggerBtn.textContent = "⏳ Scanning Document & Extracting Values...";
 
             statusBox.style.display = "block";
             statusBox.innerHTML = `
                 <div style="background: #ffffff; border: 1.5px solid #0d9488; border-radius: 8px; padding: 14px; display: inline-flex; align-items: center; gap: 12px; text-align: left;">
-                    <span style="display: flex; align-items: center;">${getIcon('flask', { size: 24, color: '#0d9488' })}</span>
+                    <span style="font-size: 24px; animation: pulse 1s infinite;">🔬</span>
                     <div>
                         <div style="font-size: 14px; font-weight: 800; color: #0f172a;">Reading ${file.name}...</div>
                         <div style="font-size: 12px; color: #64748b;">Processing lab reference intervals & flag out-of-range biomarkers</div>
@@ -550,7 +533,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                 statusBox.innerHTML = `
                     <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; padding: 14px 20px; text-align: left; max-width: 600px; margin: auto;">
                         <div style="font-size: 15px; font-weight: 800; color: #166534; display: flex; align-items: center; gap: 8px;">
-                            ${getIcon('check-circle', { size: 18, color: '#166534' })}
+                            <span>✅</span>
                             <span>Report Successfully Uploaded & Linked to ABHA!</span>
                         </div>
                         <div style="font-size: 13px; color: #15803d; margin-top: 4px;">
@@ -569,7 +552,7 @@ export function renderPatientDashboard(container, onStartIntake, onSignOut) {
                 statusBox.innerHTML = `<div style="color: #b91c1c; font-weight: 700; font-size: 13px;">Error processing document. Please try again.</div>`;
             } finally {
                 triggerBtn.disabled = false;
-                triggerBtn.innerHTML = `${getIcon('upload', { size: 16, color: '#ffffff' })} <span>Browse Storage & Upload File</span>`;
+                triggerBtn.textContent = "📂 Browse Storage & Upload File";
             }
         });
     }

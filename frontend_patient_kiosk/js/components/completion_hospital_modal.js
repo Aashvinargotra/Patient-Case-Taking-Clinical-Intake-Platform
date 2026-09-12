@@ -6,7 +6,6 @@ import { getTranslation } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { apiService } from "../api_service.js";
-import { getIcon } from "../icons.js";
 
 export function renderCompletionHospitalFlow(container, onFinished) {
     const state = kioskState.getState();
@@ -36,9 +35,7 @@ export function renderCompletionHospitalFlow(container, onFinished) {
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 950px; margin: auto; animation: fade-in 300ms ease;">
                 
                 <div style="text-align: center; margin-bottom: 28px;">
-                    <div style="display: flex; justify-content: center; margin-bottom: 12px;">
-                        ${getIcon('clipboard-list', { size: 48, color: '#0d9488' })}
-                    </div>
+                    <div style="font-size: 48px; margin-bottom: 8px;">📋</div>
                     <h2 style="font-size: var(--font-size-2xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">
                         ${t.completionTitle}
                     </h2>
@@ -54,8 +51,8 @@ export function renderCompletionHospitalFlow(container, onFinished) {
                     <div class="discipline-card" id="choice-account-only" tabindex="0" role="button" 
                          style="padding: 28px 24px; text-align: left; align-items: flex-start; border-color: #cbd5e1; background: #ffffff; cursor: pointer;">
                         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
-                            <div style="width: 52px; height: 52px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
-                                ${getIcon('lock', { size: 26, color: '#64748b' })}
+                            <div style="width: 52px; height: 52px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 26px;">
+                                🔒
                             </div>
                             <div>
                                 <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">${t.choiceAccountOnlyTitle}</h3>
@@ -76,8 +73,8 @@ export function renderCompletionHospitalFlow(container, onFinished) {
                     <div class="discipline-card allopathy" id="choice-parchi" tabindex="0" role="button" 
                          style="padding: 28px 24px; text-align: left; align-items: flex-start; border-color: #0d9488; background: #ffffff; cursor: pointer; box-shadow: 0 10px 25px rgba(13, 148, 136, 0.12);">
                         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
-                            <div style="width: 52px; height: 52px; border-radius: 12px; background: #f0fdfa; border: 1.5px solid #0d9488; display: flex; align-items: center; justify-content: center;">
-                                ${getIcon('file-text', { size: 26, color: '#0d9488' })}
+                            <div style="width: 52px; height: 52px; border-radius: 12px; background: #f0fdfa; border: 1.5px solid #0d9488; display: flex; align-items: center; justify-content: center; font-size: 26px;">
+                                📄
                             </div>
                             <div>
                                 <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">${t.choiceParchiTitle}</h3>
@@ -88,9 +85,8 @@ export function renderCompletionHospitalFlow(container, onFinished) {
                             ${t.choiceParchiDesc}
                         </p>
                         <div style="margin-top: auto; width: 100%;">
-                            <button class="header-btn active" style="width: 100%; justify-content: center; height: 44px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
-                                <span>${t.choiceParchiTitle}</span>
-                                ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
+                            <button class="header-btn active" style="width: 100%; justify-content: center; height: 44px; font-size: 14px;">
+                                ${t.choiceParchiTitle} ➔
                             </button>
                         </div>
                     </div>
@@ -127,9 +123,7 @@ export function renderCompletionHospitalFlow(container, onFinished) {
             <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1050px; margin: auto; animation: fade-in 300ms ease;">
                 
                 <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="display: flex; justify-content: center; margin-bottom: 8px;">
-                        ${getIcon('hospital', { size: 42, color: '#0d9488' })}
-                    </div>
+                    <div style="font-size: 40px; margin-bottom: 6px;">🏥</div>
                     <h2 style="font-size: var(--font-size-2xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">
                         ${t.selectHospitalTitle}
                     </h2>
@@ -147,9 +141,8 @@ export function renderCompletionHospitalFlow(container, onFinished) {
                             <div class="discipline-card ${isSelected ? 'allopathy' : ''}" data-hosp-id="${h.hospital_id}" tabindex="0" role="button"
                                  style="padding: 20px 22px; text-align: left; align-items: flex-start; border-color: ${isSelected ? '#0d9488' : '#cbd5e1'}; background: #ffffff; cursor: pointer;">
                                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-start; margin-bottom: 8px;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
-                                        ${getIcon('map-pin', { size: 12, color: '#0369a1' })}
-                                        <span>${h.city || 'Delhi'}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px;">
+                                        📍 ${h.city || 'Delhi'}
                                     </span>
                                     <span style="font-size: 11px; font-weight: 700; color: #0d9488; background: #ccfbf1; padding: 2px 8px; border-radius: 4px;">
                                         ${h.badge || 'Linked Network'}

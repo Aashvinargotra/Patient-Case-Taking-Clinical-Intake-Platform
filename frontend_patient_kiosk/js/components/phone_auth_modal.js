@@ -5,7 +5,6 @@
  */
 import { kioskState } from "../state.js";
 import { apiService } from "../api_service.js";
-import { getIcon } from "../icons.js";
 
 const DEMO_PHONE_PATIENTS = [
     {
@@ -81,17 +80,15 @@ export function renderPhoneAuthModal(container, onSuccess, onCancel) {
             <!-- Modal Header -->
             <div class="modal-header" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 22px 24px; color: #ffffff; display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
-                        ${getIcon('smartphone', { size: 24, color: '#38bdf8' })}
+                    <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        📱
                     </div>
                     <div>
                         <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">Mobile Number Authentication</h3>
                         <p style="font-size: 12.5px; color: #cbd5e1; margin: 3px 0 0 0;">Fast Patient Login via Phone & 4-Digit MPIN / OTP</p>
                     </div>
                 </div>
-                <button id="btn-close-phone-modal" aria-label="Close modal" style="background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center;">
-                    ${getIcon('x', { size: 18, color: '#ffffff' })}
-                </button>
+                <button id="btn-close-phone-modal" style="background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 18px; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center;">✕</button>
             </div>
 
             <!-- Modal Body -->
@@ -99,20 +96,17 @@ export function renderPhoneAuthModal(container, onSuccess, onCancel) {
                 
                 <!-- Quick Demo Selectors -->
                 <div style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px;">
-                        ${getIcon('zap', { size: 14, color: '#0284c7' })}
-                        <span>Quick Demo Patient Fill:</span>
-                    </div>
+                    <span style="display: block; font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px;">
+                        ⚡ Quick Demo Patient Fill:
+                    </span>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                         <button type="button" class="btn-demo-phone" data-phone="9876543210" data-mpin="1234"
-                                style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; color: #0f172a; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                            ${getIcon('user', { size: 14, color: '#0369a1' })}
-                            <span>Ramesh Kumar (9876543210)</span>
+                                style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; color: #0f172a; cursor: pointer;">
+                            👤 Ramesh Kumar (9876543210)
                         </button>
                         <button type="button" class="btn-demo-phone" data-phone="9123456780" data-mpin="4321"
-                                style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; color: #0f172a; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                            ${getIcon('user', { size: 14, color: '#0369a1' })}
-                            <span>Aarav Sharma (9123456780)</span>
+                                style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; color: #0f172a; cursor: pointer;">
+                            👤 Aarav Sharma (9123456780)
                         </button>
                     </div>
                 </div>
@@ -126,7 +120,7 @@ export function renderPhoneAuthModal(container, onSuccess, onCancel) {
                         </label>
                         <div style="display: flex; align-items: center; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #ffffff; overflow: hidden; height: 48px;">
                             <span style="background: #f1f5f9; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 14px; font-weight: 700; color: #475569; border-right: 1px solid #cbd5e1;">
-                                +91
+                                🇮🇳 +91
                             </span>
                             <input type="tel" id="input-phone-number" required maxlength="10" 
                                    placeholder="e.g. 9876543210" value="9876543210"
@@ -142,23 +136,19 @@ export function renderPhoneAuthModal(container, onSuccess, onCancel) {
                             <span style="font-size: 12px; color: #0d9488; font-weight: 600;">(Demo: 1234)</span>
                         </div>
                         <input type="password" id="input-phone-mpin" required maxlength="4" 
-                                placeholder="••••" value="1234"
-                                style="height: 48px; width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; padding: 0 14px; font-size: 22px; font-weight: 900; letter-spacing: 6px; text-align: center; color: #0f172a;" />
+                               placeholder="••••" value="1234"
+                               style="height: 48px; width: 100%; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; padding: 0 14px; font-size: 22px; font-weight: 900; letter-spacing: 6px; text-align: center; color: #0f172a;" />
                     </div>
 
                     <div id="phone-auth-error" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; font-size: 12.5px; font-weight: 700; padding: 8px 12px; border-radius: 6px;"></div>
 
                     <button type="submit" id="btn-submit-phone-auth" class="header-btn active" 
-                            style="width: 100%; height: 50px; justify-content: center; font-size: 15px; font-weight: 800; margin-top: 6px; display: inline-flex; align-items: center; gap: 8px;">
-                        <span>Verify & Login to MediKiosk</span>
-                        ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
+                            style="width: 100%; height: 50px; justify-content: center; font-size: 15px; font-weight: 800; margin-top: 6px;">
+                        Verify & Login to MediKiosk ➔
                     </button>
                 </form>
 
             </div>
-
-        </div>
-    `;</div>
 
         </div>
     `;
