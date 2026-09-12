@@ -80,12 +80,17 @@ class InactivityTimer {
         this.clearTimers();
         this.isShowingModal = false;
         
-        // Wipe all memory
+        // Wipe all memory and flag session timed out
         kioskState.flushMemory();
+        kioskState.setState({ sessionTimedOut: true });
         
         if (this.onTimeoutCallback) {
             this.onTimeoutCallback();
         }
+    }
+
+    onTimeoutTrigger() {
+        this.triggerTimeout();
     }
 
     pauseTimer() {

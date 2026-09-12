@@ -24,6 +24,7 @@ import { renderVoiceLoop } from "./components/voice_loop_modal.js";
 import { renderCameraScanner } from "./components/camera_scanner.js";
 import { renderCompletionHospitalFlow } from "./components/completion_hospital_modal.js";
 import { renderSlipGenerator } from "./components/slip_generator.js";
+import { renderPatientDashboard } from "./components/patient_dashboard.js";
 
 class MediKioskApp {
     constructor() {
@@ -149,8 +150,26 @@ class MediKioskApp {
         switch (this.currentScreen) {
             case "AUTH":
                 renderAuthScreen(this.viewportContainer, (patient) => {
-                    this.navigateTo("DISCIPLINE");
+                    // Authenticated users go to their Patient Profile Dashboard;
+                    // Temporary walk-in patients proceed directly to DISCIPLINE intake
+                    if (patient && patient.is_temporary) {
+                        this.navigateTo("DISCIPLINE");
+                    } else {
+                        this.navigateTo("PATIENT_DASHBOARD");
+                    }
                 });
+                break;
+
+            case "PATIENT_DASHBOARD":
+                renderPatientDashboard(
+                    this.viewportContainer,
+                    () => {
+                        this.navigateTo("DISCIPLINE");
+                    },
+                    () => {
+                        this.navigateTo("AUTH");
+                    }
+                );
                 break;
 
             case "DISCIPLINE":

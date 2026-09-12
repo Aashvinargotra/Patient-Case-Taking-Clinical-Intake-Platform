@@ -216,6 +216,7 @@ export function renderPhoneAuthModal(container, onSuccess, onCancel) {
             patientName: matched.full_name,
             patientPhone: phone,
             abhaId: matched.abha_id,
+            abhaAddress: matched.abha_id,
             gender: matched.gender,
             birthYear: matched.birth_year,
             isTemporary: false,

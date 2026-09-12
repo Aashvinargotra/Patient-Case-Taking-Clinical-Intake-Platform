@@ -15,6 +15,26 @@ export function renderAuthScreen(container, onAuthSuccess) {
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 1000px; margin: auto; animation: fade-in 300ms ease;">
             
+            ${state.sessionTimedOut ? `
+                <!-- Session Timed Out Notice Banner -->
+                <div id="session-timeout-banner" style="width: 100%; max-width: 900px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: var(--radius-md); padding: 16px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 14px rgba(245,158,11,0.12); animation: fade-in 300ms ease;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <span style="font-size: 28px;">⏱️</span>
+                        <div>
+                            <div style="font-size: 15.5px; font-weight: 800; color: #92400e;">
+                                ${state.language === 'hi' ? 'सत्र समाप्त हो गया - कृपया पुनः लॉगिन करें' : 'Session Timed Out Due to Inactivity'}
+                            </div>
+                            <div style="font-size: 13px; color: #b45309; margin-top: 2px;">
+                                ${state.language === 'hi' ? 'आपकी सुरक्षा और गोपनीयता के लिए निष्क्रियता के कारण सत्र रीसेट हो गया है। कृपया आगे बढ़ने के लिए पुनः लॉगिन करें।' : 'For your privacy and security, your previous session was reset. Please log in again to continue.'}
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-dismiss-timeout-banner" title="Dismiss" style="background: none; border: none; font-size: 20px; color: #92400e; cursor: pointer; padding: 4px 8px; font-weight: 800; border-radius: 4px;">
+                        ✕
+                    </button>
+                </div>
+            ` : ''}
+
             <div style="text-align: center; margin-bottom: 28px;">
                 <span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 13px; font-weight: 800; padding: 4px 16px; border-radius: 9999px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
                     ${t.govtTag}
@@ -98,20 +118,33 @@ export function renderAuthScreen(container, onAuthSuccess) {
         audioController.speak(welcomeSpeech, state.language);
     }, 400);
 
+    // Dismiss session timeout banner
+    const dismissBtn = container.querySelector("#btn-dismiss-timeout-banner");
+    if (dismissBtn) {
+        dismissBtn.addEventListener("click", () => {
+            kioskState.setState({ sessionTimedOut: false });
+            const banner = container.querySelector("#session-timeout-banner");
+            if (banner) banner.remove();
+        });
+    }
+
     // Event Listeners
     container.querySelector("#card-auth-abha").addEventListener("click", () => {
+        kioskState.setState({ sessionTimedOut: false });
         renderAbhaAuthModal(container, (patient) => {
             if (onAuthSuccess) onAuthSuccess(patient);
         });
     });
 
     container.querySelector("#card-auth-phone").addEventListener("click", () => {
+        kioskState.setState({ sessionTimedOut: false });
         renderPhoneAuthModal(container, (patient) => {
             if (onAuthSuccess) onAuthSuccess(patient);
         });
     });
 
     container.querySelector("#btn-submit-walkin").addEventListener("click", async () => {
+        kioskState.setState({ sessionTimedOut: false });
         const phone = container.querySelector("#walkin-phone-input").value.trim();
         const walkinPatient = {
             patient_id: `TEMP-${Math.floor(1000 + Math.random() * 9000)}`,

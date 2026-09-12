@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.schemas import hospitals, departments, doctors, staff_users, patients
+from app.models.schemas import (
+    hospitals, departments, doctors, staff_users, patients,
+    visit_sessions, clinical_summaries, token_records
+)
 from app.core.security import hash_password, encrypt_phone, compute_search_hash
 
 # 0. Top Linked Healthcare Institutes
@@ -295,6 +298,218 @@ INITIAL_PATIENTS = [
     }
 ]
 
+# 5. Default Demonstration Visit Sessions (Historical & Live)
+INITIAL_VISITS = [
+    {
+        "session_id": "SESS-HIST-01",
+        "patient_id": "PAT-1001",
+        "hospital_id": "HOSP-SAF-ND",
+        "department_id": "CARDIOLOGY",
+        "assigned_room": "Room 104 (1st Floor)",
+        "intake_language": "hi",
+        "status": "COMPLETED",
+        "intake_channel": "KIOSK",
+        "start_time": datetime(2026, 5, 15, 11, 0, tzinfo=timezone.utc),
+        "completion_time": datetime(2026, 5, 15, 11, 35, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 5, 15, 11, 0, tzinfo=timezone.utc)
+    },
+    {
+        "session_id": "SESS-HIST-02",
+        "patient_id": "PAT-DEMO-01",
+        "hospital_id": "HOSP-AIIMS-ND",
+        "department_id": "GEN_MED",
+        "assigned_room": "Room 101 (Ground Floor)",
+        "intake_language": "en",
+        "status": "COMPLETED",
+        "intake_channel": "KIOSK",
+        "start_time": datetime(2026, 6, 22, 10, 15, tzinfo=timezone.utc),
+        "completion_time": datetime(2026, 6, 22, 10, 50, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 6, 22, 10, 15, tzinfo=timezone.utc)
+    },
+    {
+        "session_id": "SESS-HIST-03",
+        "patient_id": "PAT-1002",
+        "hospital_id": "HOSP-AIIA-ND",
+        "department_id": "KAYACHIKITSA",
+        "assigned_room": "Room A-101",
+        "intake_language": "hi",
+        "status": "COMPLETED",
+        "intake_channel": "KIOSK",
+        "start_time": datetime(2026, 7, 10, 11, 45, tzinfo=timezone.utc),
+        "completion_time": datetime(2026, 7, 10, 12, 20, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 7, 10, 11, 45, tzinfo=timezone.utc)
+    },
+    # Live Waiting Sessions
+    {
+        "session_id": "SESS-LIVE-101",
+        "patient_id": "PAT-DEMO-01",
+        "hospital_id": "HOSP-AIIA-ND",
+        "department_id": "GEN_MED",
+        "assigned_room": "Room 101 (Ground Floor)",
+        "intake_language": "hi",
+        "status": "READY_FOR_DR",
+        "intake_channel": "KIOSK",
+        "start_time": datetime.now(timezone.utc),
+        "completion_time": None,
+        "created_at": datetime.now(timezone.utc)
+    },
+    {
+        "session_id": "SESS-LIVE-102",
+        "patient_id": "PAT-1001",
+        "hospital_id": "HOSP-AIIA-ND",
+        "department_id": "CARDIOLOGY",
+        "assigned_room": "Room 104 (1st Floor)",
+        "intake_language": "hi",
+        "status": "READY_FOR_DR",
+        "intake_channel": "KIOSK",
+        "start_time": datetime.now(timezone.utc),
+        "completion_time": None,
+        "created_at": datetime.now(timezone.utc)
+    },
+    {
+        "session_id": "SESS-LIVE-103",
+        "patient_id": "PAT-1002",
+        "hospital_id": "HOSP-AIIA-ND",
+        "department_id": "KAYACHIKITSA",
+        "assigned_room": "Room A-101",
+        "intake_language": "hi",
+        "status": "READY_FOR_DR",
+        "intake_channel": "KIOSK",
+        "start_time": datetime.now(timezone.utc),
+        "completion_time": None,
+        "created_at": datetime.now(timezone.utc)
+    }
+]
+
+# 6. Default Clinical Summaries (Completed Consultations with Prescriptions & Live Intakes)
+INITIAL_SUMMARIES = [
+    {
+        "summary_id": "SUMM-HIST-01",
+        "session_id": "SESS-HIST-01",
+        "patient_id": "PAT-1001",
+        "chief_complaint": "Essential Hypertension & Occasional Palpitations",
+        "structured_history": {"bp": "146/92 mmHg", "duration": "6 months", "family_history": "Mother hypertensive"},
+        "extracted_investigations": [{"test": "Serum Creatinine", "value": "0.9", "unit": "mg/dL"}, {"test": "Lipid Profile", "value": "Borderline", "unit": ""}],
+        "draft_summary_text": "Patient Ramesh Kumar (48/M) presented with recurrent morning occipital headaches and elevated systolic BP. No chest pain at rest.",
+        "doctor_notes": "Confirmed Diagnosis: Stage-1 Essential Hypertension (ICD-10 I10)\n\nPrescription:\n1. Tab. Telmisartan 40mg - 1 Tab Once Daily (OD) in morning after food\n2. Tab. Amlodipine 5mg - 1 Tab Once Daily (HS) at bedtime\n\nLifestyle: Low-salt diet (<2g/day), 30 min daily walking, record home BP twice weekly. Follow up in 4 weeks.",
+        "is_draft": False,
+        "verified_by_doctor_id": "DOC-CARDIO-01",
+        "verified_at": datetime(2026, 5, 15, 11, 35, tzinfo=timezone.utc),
+        "generated_at": datetime(2026, 5, 15, 11, 15, tzinfo=timezone.utc)
+    },
+    {
+        "summary_id": "SUMM-HIST-02",
+        "session_id": "SESS-HIST-02",
+        "patient_id": "PAT-DEMO-01",
+        "chief_complaint": "Recurrent Seasonal Allergic Rhinitis & Paroxysmal Sneezing",
+        "structured_history": {"duration": "3 weeks", "triggers": "Morning dust, pollen", "fever": "None"},
+        "extracted_investigations": [{"test": "Absolute Eosinophil Count", "value": "480", "unit": "cells/mcL"}],
+        "draft_summary_text": "Patient Aarav Sharma (38/M) presented with acute rhinorrhea, itchy eyes, and sneezing bouts (15-20 sneezes daily).",
+        "doctor_notes": "Confirmed Diagnosis: Seasonal Allergic Rhinitis (ICD-10 J30.1)\n\nPrescription:\n1. Tab. Montelukast 10mg + Levocetirizine 5mg - 1 Tab OD at bedtime for 14 days\n2. Fluticasone Furoate Nasal Spray 27.5 mcg - 1 puff in each nostril OD in morning\n\nAdvice: Avoid direct pollen/dust exposure, use warm saline gargle and nasal wash.",
+        "is_draft": False,
+        "verified_by_doctor_id": "DOC-GENMED-01",
+        "verified_at": datetime(2026, 6, 22, 10, 50, tzinfo=timezone.utc),
+        "generated_at": datetime(2026, 6, 22, 10, 30, tzinfo=timezone.utc)
+    },
+    {
+        "summary_id": "SUMM-HIST-03",
+        "session_id": "SESS-HIST-03",
+        "patient_id": "PAT-1002",
+        "chief_complaint": "Amlapitta (Hyperacidity) & Retrosternal Burning",
+        "structured_history": {"prakriti": "Pitta-Vata", "agni": "Tikshnagni", "koshtha": "Krura"},
+        "extracted_investigations": [{"test": "H. Pylori Stool Antigen", "value": "Negative", "unit": ""}],
+        "draft_summary_text": "Patient Sunita Devi (61/F) presented with epigastric burning (Hrit-Kantha Daha), acid belching, and disturbed sleep for 2 months.",
+        "doctor_notes": "Confirmed Diagnosis: Urdhvaga Amlapitta (Pitta Prakopa)\n\nAyurvedic Prescription:\n1. Avipattikar Churna - 3 grams twice daily (BD) with lukewarm water before meals\n2. Kamadudha Rasa (Mukta Yukta) - 250 mg twice daily with honey\n3. Sutshekhar Rasa - 125 mg twice daily after meals\n\nPathya: Barley water, pomegranate, avoid spicy/sour/fermented food and late dinners.",
+        "is_draft": False,
+        "verified_by_doctor_id": "DOC-AYUSH-01",
+        "verified_at": datetime(2026, 7, 10, 12, 20, tzinfo=timezone.utc),
+        "generated_at": datetime(2026, 7, 10, 12, 0, tzinfo=timezone.utc)
+    },
+    # Live Waiting Summaries
+    {
+        "summary_id": "SUMM-LIVE-101",
+        "session_id": "SESS-LIVE-101",
+        "patient_id": "PAT-DEMO-01",
+        "chief_complaint": "Persistent dry cough & body ache for 4 days",
+        "structured_history": {"cough": "Dry", "duration": "4 days", "fever": "Low-grade 99.4 F"},
+        "extracted_investigations": [],
+        "draft_summary_text": "Aarav Sharma (38/M) reports irritable non-productive cough, mild throat soreness, and fatigue. No chest tightness.",
+        "doctor_notes": None,
+        "is_draft": True,
+        "verified_by_doctor_id": None,
+        "verified_at": None,
+        "generated_at": datetime.now(timezone.utc)
+    },
+    {
+        "summary_id": "SUMM-LIVE-102",
+        "session_id": "SESS-LIVE-102",
+        "patient_id": "PAT-1001",
+        "chief_complaint": "Substernal chest pressure radiating to left arm with diaphoresis",
+        "structured_history": {"chest_pain": "Heavy pressure 8/10", "duration": "45 mins", "sweating": "Profuse"},
+        "extracted_investigations": [],
+        "draft_summary_text": "Ramesh Kumar (48/M) presents with acute crushing retrosternal chest discomfort and cold sweats. High suspicion of Acute Coronary Syndrome.",
+        "doctor_notes": None,
+        "is_draft": True,
+        "verified_by_doctor_id": None,
+        "verified_at": None,
+        "generated_at": datetime.now(timezone.utc)
+    },
+    {
+        "summary_id": "SUMM-LIVE-103",
+        "session_id": "SESS-LIVE-103",
+        "patient_id": "PAT-1002",
+        "chief_complaint": "Bilateral knee stiffness & joint crepitus (Sandhivata)",
+        "structured_history": {"joint_pain": "Both knees", "aggravation": "Cold morning & standing", "swelling": "Mild"},
+        "extracted_investigations": [],
+        "draft_summary_text": "Sunita Devi (61/F) reports chronic morning knee pain and difficulty climbing stairs. Appetite moderate, dry skin noted.",
+        "doctor_notes": None,
+        "is_draft": True,
+        "verified_by_doctor_id": None,
+        "verified_at": None,
+        "generated_at": datetime.now(timezone.utc)
+    }
+]
+
+# 7. Default Live Queue Tokens
+INITIAL_TOKENS = [
+    {
+        "token_id": "TOK-LIVE-101",
+        "session_id": "SESS-LIVE-101",
+        "patient_id": "PAT-DEMO-01",
+        "hospital_id": "HOSP-AIIA-ND",
+        "token_number": 101,
+        "priority_tier": "AMBER",
+        "queue_status": "WAITING",
+        "department_id": "GEN_MED",
+        "signed_qr_token": "TOKEN-101-SIGNED-QR",
+        "issued_at": datetime.now(timezone.utc)
+    },
+    {
+        "token_id": "TOK-LIVE-102",
+        "session_id": "SESS-LIVE-102",
+        "patient_id": "PAT-1001",
+        "hospital_id": "HOSP-AIIA-ND",
+        "token_number": 102,
+        "priority_tier": "RED",
+        "queue_status": "WAITING",
+        "department_id": "CARDIOLOGY",
+        "signed_qr_token": "TOKEN-102-SIGNED-QR",
+        "issued_at": datetime.now(timezone.utc)
+    },
+    {
+        "token_id": "TOK-LIVE-103",
+        "session_id": "SESS-LIVE-103",
+        "patient_id": "PAT-1002",
+        "hospital_id": "HOSP-AIIA-ND",
+        "token_number": 103,
+        "priority_tier": "NORMAL",
+        "queue_status": "WAITING",
+        "department_id": "KAYACHIKITSA",
+        "signed_qr_token": "TOKEN-103-SIGNED-QR",
+        "issued_at": datetime.now(timezone.utc)
+    }
+]
+
 async def seed_database(db: AsyncSession):
     """
     Idempotently seeds all core linked hospitals, departments, clinical doctors, staff, and test patients.
@@ -333,5 +548,26 @@ async def seed_database(db: AsyncSession):
         existing = (await db.execute(q)).fetchone()
         if not existing:
             await db.execute(patients.insert().values(**p))
+
+    # 5. Seed Historical & Live Visit Sessions
+    for v in INITIAL_VISITS:
+        q = select(visit_sessions).where(visit_sessions.c.session_id == v["session_id"])
+        existing = (await db.execute(q)).fetchone()
+        if not existing:
+            await db.execute(visit_sessions.insert().values(**v))
+
+    # 6. Seed Clinical Summaries (Completed Consultations & Live Intakes)
+    for s in INITIAL_SUMMARIES:
+        q = select(clinical_summaries).where(clinical_summaries.c.summary_id == s["summary_id"])
+        existing = (await db.execute(q)).fetchone()
+        if not existing:
+            await db.execute(clinical_summaries.insert().values(**s))
+
+    # 7. Seed Active OPD Tokens
+    for t in INITIAL_TOKENS:
+        q = select(token_records).where(token_records.c.token_id == t["token_id"])
+        existing = (await db.execute(q)).fetchone()
+        if not existing:
+            await db.execute(token_records.insert().values(**t))
 
     await db.commit()

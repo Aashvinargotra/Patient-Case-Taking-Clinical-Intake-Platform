@@ -211,6 +211,10 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                     patientId: res.patient.patient_id,
                     patientName: res.patient.full_name,
                     abhaAddress: res.patient.abha_address,
+                    gender: res.patient.gender || "M",
+                    birthYear: res.patient.birth_year || 1992,
+                    patientPhone: res.patient.phone || "9876543210",
+                    isTemporary: false,
                     token: res.access_token
                 });
                 modalEl.remove();
@@ -218,17 +222,38 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
             }
         } catch (err) {
             // Offline fallback
-            const fallbackPatient = {
+            const isPriya = abhaVal.toLowerCase().includes("priya");
+            const isRamesh = abhaVal.toLowerCase().includes("ramesh");
+            const fallbackPatient = isPriya ? {
+                patient_id: "PAT-PRIYA-02",
+                full_name: "Priya Sharma",
+                gender: "FEMALE",
+                birth_year: 1995,
+                phone: "9811223344",
+                abha_address: abhaVal || "priya.sharma@abdm"
+            } : (isRamesh ? {
+                patient_id: "PAT-DEL-8912",
+                full_name: "Ramesh Kumar",
+                gender: "MALE",
+                birth_year: 1982,
+                phone: "9876543210",
+                abha_address: abhaVal || "ramesh.kumar@abdm"
+            } : {
                 patient_id: "PAT-DEMO-01",
                 full_name: "Aarav Sharma",
                 gender: "MALE",
-                birth_year: 1988,
+                birth_year: 1994,
+                phone: "9123456780",
                 abha_address: abhaVal || "aarav.sharma@abdm"
-            };
+            });
             kioskState.setState({
                 patientId: fallbackPatient.patient_id,
                 patientName: fallbackPatient.full_name,
-                abhaAddress: fallbackPatient.abha_address
+                abhaAddress: fallbackPatient.abha_address,
+                gender: fallbackPatient.gender,
+                birthYear: fallbackPatient.birth_year,
+                patientPhone: fallbackPatient.phone,
+                isTemporary: false
             });
             modalEl.remove();
             if (onSuccess) onSuccess(fallbackPatient);
@@ -260,6 +285,10 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                 patientId: res.patient_id,
                 patientName: res.full_name,
                 abhaAddress: res.abha_address,
+                gender,
+                birthYear,
+                patientPhone: mobile,
+                isTemporary: false,
                 token: res.access_token
             });
             modalEl.remove();
@@ -270,12 +299,17 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                 full_name: name,
                 gender,
                 birth_year: birthYear,
+                phone: mobile,
                 abha_address: desiredAbha
             };
             kioskState.setState({
                 patientId: fallbackPatient.patient_id,
                 patientName: fallbackPatient.full_name,
-                abhaAddress: fallbackPatient.abha_address
+                abhaAddress: fallbackPatient.abha_address,
+                gender,
+                birthYear,
+                patientPhone: mobile,
+                isTemporary: false
             });
             modalEl.remove();
             if (onSuccess) onSuccess(fallbackPatient);
@@ -288,13 +322,18 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
             patient_id: "PAT-DEMO-01",
             full_name: "Aarav Sharma",
             gender: "MALE",
-            birth_year: 1988,
+            birth_year: 1994,
+            phone: "9123456780",
             abha_address: "aarav.sharma@abdm"
         };
         kioskState.setState({
             patientId: qrPatient.patient_id,
             patientName: qrPatient.full_name,
-            abhaAddress: qrPatient.abha_address
+            abhaAddress: qrPatient.abha_address,
+            gender: qrPatient.gender,
+            birthYear: qrPatient.birth_year,
+            patientPhone: qrPatient.phone,
+            isTemporary: false
         });
         modalEl.remove();
         if (onSuccess) onSuccess(qrPatient);
