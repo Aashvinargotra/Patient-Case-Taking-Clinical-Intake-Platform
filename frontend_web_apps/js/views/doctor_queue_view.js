@@ -4,6 +4,7 @@
  */
 import { portalState } from "../state.js";
 import { portalApi } from "../api.js";
+import { getIcon } from "../icons.js";
 
 let queuePollInterval = null;
 
@@ -34,7 +35,9 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
             return `
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 48px 20px; color: #64748b;">
-                        <div style="font-size: 36px; margin-bottom: 12px;">✅</div>
+                        <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+                            ${getIcon('check-circle', { size: 38, color: '#10b981' })}
+                        </div>
                         <div style="font-size: 16px; font-weight: 700; color: #0f172a;">No Patients Currently in Queue</div>
                         <div style="font-size: 13px; margin-top: 4px;">All registered patients for this department have been attended. Live updates active.</div>
                     </td>
@@ -54,8 +57,8 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
                     </div>
                 </td>
                 <td style="padding: 16px 20px;">
-                    <span class="badge ${item.priority_tier === 'RED' ? 'badge-red' : (item.priority_tier === 'AMBER' ? 'badge-amber' : 'badge-green')}">
-                        ${item.priority_tier === 'RED' ? '🚨 TIER-1 RED' : (item.priority_tier === 'AMBER' ? '⚠️ TIER-2 AMBER' : 'NORMAL')}
+                    <span class="badge ${item.priority_tier === 'RED' ? 'badge-red' : (item.priority_tier === 'AMBER' ? 'badge-amber' : 'badge-green')}" style="display: inline-flex; align-items: center; gap: 5px;">
+                        ${item.priority_tier === 'RED' ? `${getIcon('alert-circle', { size: 14, color: '#b91c1c' })} TIER-1 RED` : (item.priority_tier === 'AMBER' ? `${getIcon('alert-triangle', { size: 14, color: '#b45309' })} TIER-2 AMBER` : `${getIcon('check', { size: 13, color: '#15803d' })} NORMAL`)}
                     </span>
                 </td>
                 <td style="padding: 16px 20px; max-width: 320px;">
@@ -67,8 +70,8 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
                     <button class="btn btn-primary btn-consult-patient" 
                             data-pat-id="${item.patient_id}"
                             data-tok-num="${item.token_number}"
-                            style="padding: 8px 18px; font-size: 13px; font-weight: 800;">
-                        🚪 Call Into Cabin ➔
+                            style="padding: 8px 18px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 7px;">
+                        Call Into Cabin ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
                     </button>
                 </td>
             </tr>
@@ -87,13 +90,14 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
                         <span style="font-size: 12px; font-weight: 800; color: #0d9488; text-transform: uppercase; letter-spacing: 0.5px;">
                             ${activeRoom} • ${activeDeptName}
                         </span>
-                        <span id="live-sync-indicator" style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 9999px;">
+                        <span id="live-sync-indicator" style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 9999px;">
                             <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1.5s infinite;"></span>
                             LIVE REAL-TIME SYNC
                         </span>
                     </div>
-                    <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 4px 0 0 0;">
-                        📋 My Assigned Patient OPD Queue
+                    <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 6px 0 0 0; display: flex; align-items: center; gap: 10px;">
+                        ${getIcon('clipboard-list', { size: 24, color: '#0d9488' })}
+                        <span>My Assigned Patient OPD Queue</span>
                     </h2>
                 </div>
 
@@ -122,8 +126,8 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
 
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <select id="select-queue-dept" style="background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; outline: none;">
-                            <option value="${activeDept}">👨‍⚕️ My Department (${activeDept})</option>
-                            <option value="ALL">🏥 All Hospital Departments</option>
+                            <option value="${activeDept}">My Department (${activeDept})</option>
+                            <option value="ALL">All Hospital Departments</option>
                             <option value="GEN_MED">General Medicine OPD</option>
                             <option value="KAYACHIKITSA">Kayachikitsa (Ayurveda)</option>
                             <option value="CARDIOLOGY">Cardiology OPD</option>
@@ -132,8 +136,13 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
                             <option value="DERMATOLOGY">Dermatology OPD</option>
                             <option value="EMERGENCY">Emergency Triage</option>
                         </select>
-                        <input type="text" id="input-queue-filter" placeholder="🔍 Search Token # or Patient Name..." 
-                               style="background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 8px 14px; border-radius: 6px; font-size: 13px; width: 260px; outline: none;">
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <span style="position: absolute; left: 10px; pointer-events: none; color: #94a3b8; display: flex; align-items: center;">
+                                ${getIcon('search', { size: 14, color: '#94a3b8' })}
+                            </span>
+                            <input type="text" id="input-queue-filter" placeholder="Search Token # or Patient Name..." 
+                                   style="background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 8px 14px 8px 32px; border-radius: 6px; font-size: 13px; width: 260px; outline: none;">
+                        </div>
                     </div>
                 </div>
 
@@ -228,7 +237,7 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
             if (metrics.total > previousTotalCount && syncBadge) {
                 syncBadge.style.background = "#dcfce7";
                 syncBadge.style.borderColor = "#22c55e";
-                syncBadge.innerHTML = `<span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block;"></span> ⚡ NEW PATIENT ARRIVED`;
+                syncBadge.innerHTML = `<span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block;"></span> <span style="display: inline-flex; align-items: center; gap: 4px;">${getIcon('zap', { size: 12, color: '#15803d' })} NEW PATIENT ARRIVED</span>`;
                 setTimeout(() => {
                     if (syncBadge && container.isConnected) {
                         syncBadge.style.background = "#ecfdf5";

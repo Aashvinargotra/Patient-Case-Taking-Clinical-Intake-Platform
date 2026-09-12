@@ -4,6 +4,7 @@
 import { getTranslation } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
+import { getIcon } from "../icons.js";
 
 export function renderDisciplineScreen(container, onDisciplineSelect) {
     const state = kioskState.getState();
@@ -16,7 +17,10 @@ export function renderDisciplineScreen(container, onDisciplineSelect) {
             <!-- Patient Profile & Welcome Header -->
             <div style="text-align: center; margin-bottom: 32px;">
                 <div style="display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1.5px solid #bbf7d0; padding: 6px 18px; border-radius: 9999px; margin-bottom: 12px;">
-                    <span style="color: #166534; font-weight: 800; font-size: 14px;">✓ ${t.welcomePatient}, ${patientName}</span>
+                    <span style="color: #166534; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+                        ${getIcon('check-circle', { size: 14, color: '#166534' })}
+                        <span>${t.welcomePatient}, ${patientName}</span>
+                    </span>
                     ${state.abhaAddress ? `<span style="font-size: 12px; color: #059669; font-weight: 600;">(${state.abhaAddress})</span>` : ''}
                 </div>
                 <h2 style="font-size: var(--font-size-2xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">${t.disciplineSelectTitle}</h2>
@@ -28,7 +32,9 @@ export function renderDisciplineScreen(container, onDisciplineSelect) {
                 
                 <!-- 1. Modern Medicine (Allopathy) Card -->
                 <div class="discipline-card allopathy" id="card-allopathy" tabindex="0" role="button" aria-label="${t.allopathyTitle}">
-                    <div class="discipline-icon">🩺</div>
+                    <div class="discipline-icon" style="display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('stethoscope', { size: 40, color: '#0284c7' })}
+                    </div>
                     <div class="discipline-title">${t.allopathyTitle}</div>
                     <div class="discipline-subtitle">${t.allopathyDesc}</div>
                     <div class="discipline-badge" style="color: #0369a1; background: #f0f9ff; border-color: #bae6fd;">
@@ -38,7 +44,9 @@ export function renderDisciplineScreen(container, onDisciplineSelect) {
 
                 <!-- 2. AYUSH / Ayurveda Card -->
                 <div class="discipline-card ayush" id="card-ayush" tabindex="0" role="button" aria-label="${t.ayushTitle}">
-                    <div class="discipline-icon">🌿</div>
+                    <div class="discipline-icon" style="display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('leaf', { size: 40, color: '#059669' })}
+                    </div>
                     <div class="discipline-title">${t.ayushTitle}</div>
                     <div class="discipline-subtitle">${t.ayushDesc}</div>
                     <div class="discipline-badge" style="color: #b45309; background: #fffbeb; border-color: #fde68a;">

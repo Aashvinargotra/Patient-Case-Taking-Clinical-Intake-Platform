@@ -14,6 +14,7 @@ import { kioskState } from "./state.js";
 import { audioController } from "./audio_controller.js";
 import { inactivityTimer } from "./inactivity_timer.js";
 import { apiService } from "./api_service.js";
+import { getIcon } from "./icons.js";
 
 // Components
 import { renderHeaderBar } from "./components/header_bar.js";
@@ -80,25 +81,25 @@ class MediKioskApp {
                 <div class="access-btn-group">
                     ${isVoiceScreen ? `
                         <button class="access-btn" id="btn-repeat-audio" aria-label="${t.repeatQuestion}">
-                            <span>🔊</span>
+                            <span style="display: flex; align-items: center;">${getIcon('volume-2', { size: 16, color: 'currentColor' })}</span>
                             <span>${t.repeatQuestion}</span>
                         </button>
                     ` : ''}
                     
                     <button class="access-btn ${state.slowSpeechMode ? 'active' : ''}" id="btn-slow-speech" aria-label="${t.slowSpeech}">
-                        <span>🐢</span>
+                        <span style="display: flex; align-items: center;">${getIcon('gauge', { size: 16, color: 'currentColor' })}</span>
                         <span>${t.slowSpeech}</span>
                     </button>
 
                     <button class="access-btn" id="btn-pause-time" aria-label="${t.needMoreTime}">
-                        <span>⏸️</span>
+                        <span style="display: flex; align-items: center;">${getIcon('pause', { size: 16, color: 'currentColor' })}</span>
                         <span>${t.needMoreTime}</span>
                     </button>
                 </div>
 
                 <div class="access-btn-group">
                     <button class="access-btn emergency-btn" id="btn-emergency-help" aria-label="${t.emergencyHelp}">
-                        <span>🚨</span>
+                        <span style="display: flex; align-items: center;">${getIcon('alert-circle', { size: 16, color: '#ffffff' })}</span>
                         <span>${t.emergencyHelp}</span>
                     </button>
                 </div>
@@ -224,7 +225,10 @@ class MediKioskApp {
             <div class="modal-overlay" role="alertdialog" aria-modal="true">
                 <div class="modal-dialog">
                     <div class="modal-header">
-                        <h3 style="color: var(--amber-warning); font-size: 22px;">⏱️ ${promptText}</h3>
+                        <h3 style="color: var(--amber-warning); font-size: 22px; display: flex; align-items: center; gap: 8px;">
+                            ${getIcon('clock', { size: 22, color: 'var(--amber-warning)' })}
+                            <span>${promptText}</span>
+                        </h3>
                     </div>
                     <div class="modal-body">
                         <p style="font-size: var(--font-size-base); color: var(--text-secondary);">
@@ -264,7 +268,7 @@ class MediKioskApp {
             : "आपातकालीन सहायता सतर्क! कर्मचारी आपकी सहायता के लिए आ रहे हैं।";
         
         audioController.speak(msg, lang);
-        alert(`🚨 [EMERGENCY ALERT] ${msg}`);
+        alert(`[EMERGENCY ALERT] ${msg}`);
     }
 }
 

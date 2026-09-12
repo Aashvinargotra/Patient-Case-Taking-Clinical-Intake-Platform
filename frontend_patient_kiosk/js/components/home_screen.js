@@ -5,6 +5,7 @@ import { CONFIG } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { renderAbhaAuthModal } from "./abha_auth_modal.js";
+import { getIcon } from "../icons.js";
 
 export function renderHomeScreen(container, onDisciplineSelect) {
     const state = kioskState.getState();
@@ -13,7 +14,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         hi: {
             title: "अखिल भारतीय आयुर्वेद संस्थान (AIIA) एवं संबद्ध अस्पताल",
             subtitle: "कृपया अपनी परामर्श प्रणाली चुनें — आधुनिक चिकित्सा या आयुर्वेद ओपीडी",
-            abhaBtn: "🪪 आभा (ABHA) आईडी से लॉगिन / पंजीकरण करें",
+            abhaBtn: "आभा (ABHA) आईडी से लॉगिन / पंजीकरण करें",
             abhaLinked: "आभा आईडी लिंक है:",
             walkinTitle: "त्वरित वॉक-इन पर्ची (वैकल्पिक मोबाइल)",
             phonePlaceholder: "अपना 10-अंकीय मोबाइल नंबर दर्ज करें",
@@ -22,7 +23,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         pa: {
             title: "ਆਲ ਇੰਡੀਆ ਇੰਸਟੀਚਿਊਟ ਆਫ਼ ਆਯੁਰਵੇਦ ਅਤੇ ਸੰਬੰਧਿਤ ਹਸਪਤਾਲ",
             subtitle: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਓ.ਪੀ.ਡੀ. ਸਿਸਟਮ ਚੁਣੋ — ਐਲੋਪੈਥੀ ਜਾਂ ਆਯੁਰਵੇਦ",
-            abhaBtn: "🪪 ਆਭਾ (ABHA) ਆਈ.ਡੀ. ਨਾਲ ਲੌਗਇਨ / ਰਜਿਸਟਰ ਕਰੋ",
+            abhaBtn: "ਆਭਾ (ABHA) ਆਈ.ਡੀ. ਨਾਲ ਲੌਗਇਨ / ਰਜਿਸਟਰ ਕਰੋ",
             abhaLinked: "ਆਭਾ ਆਈ.ਡੀ. ਲਿੰਕ ਹੈ:",
             walkinTitle: "ਤੁਰੰਤ ਵਾਕ-ਇਨ ਰਜਿਸਟ੍ਰੇਸ਼ਨ",
             phonePlaceholder: "10-ਅੰਕਾਂ ਦਾ ਮੋਬਾਈਲ ਨੰਬਰ ਦਰਜ ਕਰੋ",
@@ -31,7 +32,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         bn: {
             title: "অল ইন্ডিয়া ইনস্টিটিউট অফ আয়ুর্বেদ ও সংশ্লিষ্ট হাসপাতাল",
             subtitle: "আপনার পরামর্শ ব্যবস্থা নির্বাচন করুন — এলোপ্যাথি বা আয়ুর্বেদ ওপিডি",
-            abhaBtn: "🪪 আভা (ABHA) আইডি দিয়ে লগইন / নিবন্ধন করুন",
+            abhaBtn: "আভা (ABHA) আইডি দিয়ে লগইন / নিবন্ধন করুন",
             abhaLinked: "আভা আইডি সংযুক্ত:",
             walkinTitle: "দ্রুত ওয়াক-ইন রেজিস্ট্রেশন",
             phonePlaceholder: "১০-সংখ্যার মোবাইল নম্বর লিখুন",
@@ -40,7 +41,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         ta: {
             title: "அகில இந்திய ஆயுர்வேத நிறுவனம் மற்றும் தொடர்புடைய மருத்துவமனைகள்",
             subtitle: "உங்கள் ஆலோசனை முறையைத் தேர்ந்தெடுக்கவும் — அலோபதி அல்லது ஆயுர்வேதம்",
-            abhaBtn: "🪪 ஆபா (ABHA) ஐடி மூலம் உள்நுழைவு / பதிவு",
+            abhaBtn: "ஆபா (ABHA) ஐடி மூலம் உள்நுழைவு / பதிவு",
             abhaLinked: "ஆபா ஐடி இணைக்கப்பட்டுள்ளது:",
             walkinTitle: "விரைவான வாக்-இன் பதிவு",
             phonePlaceholder: "10 இலக்க மொபைல் எண்",
@@ -49,7 +50,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         te: {
             title: "ఆల్ ఇండియా ఇన్స్టిట్యూట్ ఆఫ్ ఆయుర్వేద మరియు అనుబంధ ఆసుపత్రులు",
             subtitle: "మీ సంప్రదింపు వ్యవస్థను ఎంచుకోండి — అలోపతి లేదా ఆయుర్వేదం",
-            abhaBtn: "🪪 ఆభా (ABHA) IDతో లాగిన్ / నమోదు",
+            abhaBtn: "ఆభా (ABHA) IDతో లాగిన్ / నమోదు",
             abhaLinked: "ఆభా ID లింక్ చేయబడింది:",
             walkinTitle: "త్వరిత వాక్-ఇన్ నమోదు",
             phonePlaceholder: "10 అంకెల మొబైల్ నంబర్",
@@ -58,7 +59,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         mr: {
             title: "अखिल भारतीय आयुर्वेद संस्थान आणि संलग्न रुग्णालये",
             subtitle: "कृपया आपली सल्लामसलत प्रणाली निवडा — आधुनिक औषधोपचार किंवा आयुर्वेद ओपीडी",
-            abhaBtn: "🪪 आभा (ABHA) आयडीने लॉगिन / नोंदणी करा",
+            abhaBtn: "आभा (ABHA) आयडीने लॉगिन / नोंदणी करा",
             abhaLinked: "आभा आयडी जोडला आहे:",
             walkinTitle: "त्वरित वॉक-इन नोंदणी",
             phonePlaceholder: "१० अंकी मोबाईल नंबर",
@@ -67,7 +68,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         gu: {
             title: "ઓલ ઇન્ડિયા ઇન્સ્ટિટ્યૂટ ઓફ આયુર્વેદ અને સંલગ્ન હોસ્પિટલો",
             subtitle: "કૃપા કરીને તમારી કન્સલ્ટેશન સિસ્ટમ પસંદ કરો — એલોપેથી અથવા આયુર્વેદ ઓપીડી",
-            abhaBtn: "🪪 આભા (ABHA) આઈડીથી લૉગિન / નોંધણી કરો",
+            abhaBtn: "આભા (ABHA) આઈડીથી લૉગિન / નોંધણી કરો",
             abhaLinked: "આભા આઈડી લિંક થયેલ છે:",
             walkinTitle: "ઝડપી વૉક-ઇન નોંધણી",
             phonePlaceholder: "૧૦ અંકનો મોબાઇલ નંબર",
@@ -76,7 +77,7 @@ export function renderHomeScreen(container, onDisciplineSelect) {
         en: {
             title: "All India Institute of Ayurveda & Associated Hospitals",
             subtitle: "Please select your clinical consultation discipline to begin pre-consultation intake",
-            abhaBtn: "🪪 Login / Register with ABHA ID (ABDM)",
+            abhaBtn: "Login / Register with ABHA ID (ABDM)",
             abhaLinked: "ABHA Linked Patient:",
             walkinTitle: "Quick Walk-in Registration (Optional Mobile)",
             phonePlaceholder: "Enter 10-digit mobile number",
@@ -100,8 +101,8 @@ export function renderHomeScreen(container, onDisciplineSelect) {
             <!-- ABHA Authentication & Patient Identity Banner -->
             <div style="width: 100%; max-width: 800px; margin-bottom: 28px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 16px 20px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 16px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 44px; height: 44px; border-radius: 8px; background: #f0fdfa; border: 1px solid #99f6e4; display: flex; align-items: center; justify-content: center; font-size: 22px;">
-                        🪪
+                    <div style="width: 44px; height: 44px; border-radius: 8px; background: #f0fdfa; border: 1px solid #99f6e4; display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('id-card', { size: 24, color: '#0d9488' })}
                     </div>
                     <div>
                         ${state.abhaAddress ? `
@@ -113,8 +114,9 @@ export function renderHomeScreen(container, onDisciplineSelect) {
                         `}
                     </div>
                 </div>
-                <button id="btn-open-abha" class="header-btn active" style="padding: 0 20px; font-size: 14px; white-space: nowrap;">
-                    ${state.abhaAddress ? 'Change ABHA ID ➔' : text.abhaBtn}
+                <button id="btn-open-abha" class="header-btn active" style="padding: 0 20px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>${state.abhaAddress ? 'Change ABHA ID' : text.abhaBtn}</span>
+                    ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
                 </button>
             </div>
 
@@ -123,7 +125,9 @@ export function renderHomeScreen(container, onDisciplineSelect) {
                 
                 <!-- Modern Medicine (Allopathy) Card -->
                 <div class="discipline-card allopathy" id="card-allopathy" tabindex="0" role="button" aria-label="Select Modern Medicine (Allopathy) OPD. SOCRATES Framework.">
-                    <div class="discipline-icon">🩺</div>
+                    <div class="discipline-icon" style="display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('stethoscope', { size: 40, color: '#0284c7' })}
+                    </div>
                     <div class="discipline-title">${CONFIG.DISCIPLINES.ALLOPATHY.title}</div>
                     <div class="discipline-subtitle">
                         General Medicine, Cardiology, Orthopedics, Gastroenterology, Dermatology.
@@ -136,7 +140,9 @@ export function renderHomeScreen(container, onDisciplineSelect) {
 
                 <!-- AYUSH / Ayurveda Card -->
                 <div class="discipline-card ayush" id="card-ayush" tabindex="0" role="button" aria-label="Select Ayurveda & AYUSH OPD. Dashavidha Pariksha Framework.">
-                    <div class="discipline-icon">🌿</div>
+                    <div class="discipline-icon" style="display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('leaf', { size: 40, color: '#059669' })}
+                    </div>
                     <div class="discipline-title">${CONFIG.DISCIPLINES.AYUSH.title}</div>
                     <div class="discipline-subtitle">
                         Kayachikitsa, Panchakarma, Shalya Tantra, Agni & Twak Roga.

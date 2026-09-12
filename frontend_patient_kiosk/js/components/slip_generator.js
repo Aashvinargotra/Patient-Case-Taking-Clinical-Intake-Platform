@@ -4,6 +4,7 @@
 import { getTranslation } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
+import { getIcon } from "../icons.js";
 
 export function renderSlipGenerator(container, tokenData, onDone) {
     const state = kioskState.getState();
@@ -20,8 +21,9 @@ export function renderSlipGenerator(container, tokenData, onDone) {
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; margin: auto; animation: fade-in 300ms ease;">
             
             <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: #059669;">
-                    ✅ ${t.parchiSuccess}
+                <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: #059669; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    ${getIcon('check-circle', { size: 28, color: '#059669' })}
+                    <span>${t.parchiSuccess}</span>
                 </h2>
                 <p style="font-size: var(--font-size-base); color: var(--text-secondary);">
                     ${isAccountOnly ? 'आपकी स्वास्थ्य रिपोर्ट सुरक्षित रूप से आभा लॉकर में सहेज ली गई है।' : t.parchiWait}
@@ -40,8 +42,10 @@ export function renderSlipGenerator(container, tokenData, onDone) {
                 <div class="slip-divider"></div>
 
                 ${isAccountOnly ? `
-                    <div style="padding: 16px 0;">
-                        <span style="font-size: 48px;">🔒</span>
+                    <div style="padding: 16px 0; display: flex; flex-direction: column; align-items: center;">
+                        <div style="margin-bottom: 8px;">
+                            ${getIcon('shield-check', { size: 48, color: '#059669' })}
+                        </div>
                         <div style="font-size: 20px; font-weight: 800; color: #059669; margin-top: 8px;">HEALTH RECORD SYNCED</div>
                         <div style="font-size: 13px; color: #64748b;">ABHA: ${state.abhaAddress || 'Verified Patient'}</div>
                     </div>
@@ -63,18 +67,21 @@ export function renderSlipGenerator(container, tokenData, onDone) {
                 <div class="qr-code-box">
                     <canvas id="token-qr-canvas" width="130" height="130" style="border: 1.5px solid #000; border-radius: 6px;"></canvas>
                 </div>
-                <div style="font-size: 11px; color: #64748b; font-weight: 600;">
-                    ${t.signedQrTag}
+                <div style="font-size: 11px; color: #64748b; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;">
+                    ${getIcon('shield-check', { size: 14, color: '#0d9488' })}
+                    <span>${t.signedQrTag}</span>
                 </div>
 
                 <div class="slip-divider"></div>
 
                 <div style="display: flex; gap: 12px; margin-top: 16px;">
-                    <button class="header-btn" id="btn-print-slip" style="flex: 1; justify-content: center; height: 44px; font-size: 14px; background: #f8fafc; border-color: #cbd5e1;">
-                        ${t.printBtn}
+                    <button class="header-btn" id="btn-print-slip" style="flex: 1; justify-content: center; height: 44px; font-size: 14px; background: #f8fafc; border-color: #cbd5e1; display: inline-flex; align-items: center; gap: 8px;">
+                        ${getIcon('printer', { size: 16, color: '#0f172a' })}
+                        <span>${t.printBtn}</span>
                     </button>
-                    <button class="header-btn active" id="btn-finish-kiosk" style="flex: 1; justify-content: center; height: 44px; font-size: 14px;">
-                        ${t.homeBtn}
+                    <button class="header-btn active" id="btn-finish-kiosk" style="flex: 1; justify-content: center; height: 44px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                        ${getIcon('home', { size: 16, color: '#ffffff' })}
+                        <span>${t.homeBtn}</span>
                     </button>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import { audioController } from "../audio_controller.js";
 import { renderAbhaAuthModal } from "./abha_auth_modal.js";
 import { renderPhoneAuthModal } from "./phone_auth_modal.js";
 import { apiService } from "../api_service.js";
+import { getIcon } from "../icons.js";
 
 export function renderAuthScreen(container, onAuthSuccess) {
     const state = kioskState.getState();
@@ -19,24 +20,25 @@ export function renderAuthScreen(container, onAuthSuccess) {
                 <!-- Session Timed Out Notice Banner -->
                 <div id="session-timeout-banner" style="width: 100%; max-width: 900px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: var(--radius-md); padding: 16px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 14px rgba(245,158,11,0.12); animation: fade-in 300ms ease;">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <span style="font-size: 28px;">⏱️</span>
+                        <span style="display: flex; align-items: center;">${getIcon('clock', { size: 28, color: '#d97706' })}</span>
                         <div>
                             <div style="font-size: 15.5px; font-weight: 800; color: #92400e;">
                                 ${state.language === 'hi' ? 'सत्र समाप्त हो गया - कृपया पुनः लॉगिन करें' : 'Session Timed Out Due to Inactivity'}
                             </div>
                             <div style="font-size: 13px; color: #b45309; margin-top: 2px;">
-                                ${state.language === 'hi' ? 'आपकी सुरक्षा और गोपनीयता के लिए निष्क्रियता के कारण सत्र रीसेट हो गया है। कृपया आगे बढ़ने के लिए पुनः लॉगिन करें।' : 'For your privacy and security, your previous session was reset. Please log in again to continue.'}
+                                ${state.language === 'hi' ? 'आपकी सुरक्षा के लिए निष्क्रिय सत्र समाप्त कर दिया गया था। जारी रखने के लिए नीचे अपना खाता चुनें।' : 'For your patient privacy and security, the inactive session was terminated. Please authenticate below to resume.'}
                             </div>
                         </div>
                     </div>
-                    <button id="btn-dismiss-timeout-banner" title="Dismiss" style="background: none; border: none; font-size: 20px; color: #92400e; cursor: pointer; padding: 4px 8px; font-weight: 800; border-radius: 4px;">
-                        ✕
+                    <button id="btn-dismiss-timeout" style="background: none; border: none; padding: 4px; color: #92400e; cursor: pointer; display: flex; align-items: center;">
+                        ${getIcon('x', { size: 18, color: '#92400e' })}
                     </button>
                 </div>
             ` : ''}
 
-            <div style="text-align: center; margin-bottom: 28px;">
-                <span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 13px; font-weight: 800; padding: 4px 16px; border-radius: 9999px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            <!-- Screen Title & Hospital Badging -->
+            <div style="text-align: center; margin-bottom: 32px;">
+                <span class="govt-badge" style="margin-bottom: 12px; display: inline-flex;">
                     ${t.govtTag}
                 </span>
                 <h2 style="font-size: var(--font-size-2xl); font-weight: 800; color: #0f172a; margin-bottom: 6px;">${t.authTitle}</h2>
@@ -49,8 +51,8 @@ export function renderAuthScreen(container, onAuthSuccess) {
                 <!-- 1. ABHA ID Digital Health Card (Primary) -->
                 <div class="discipline-card allopathy" id="card-auth-abha" tabindex="0" role="button" style="padding: 28px 24px; text-align: left; align-items: flex-start; border-color: #99f6e4; background: #ffffff;">
                     <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                        <div style="width: 60px; height: 60px; border-radius: 12px; background: #f0fdfa; border: 1.5px solid #0d9488; display: flex; align-items: center; justify-content: center; font-size: 32px;">
-                            🪪
+                        <div style="width: 60px; height: 60px; border-radius: 12px; background: #f0fdfa; border: 1.5px solid #0d9488; display: flex; align-items: center; justify-content: center;">
+                            ${getIcon('id-card', { size: 30, color: '#0d9488' })}
                         </div>
                         <div>
                             <div style="font-size: 20px; font-weight: 800; color: #0f172a;">${t.abhaLoginBtn}</div>
@@ -60,16 +62,17 @@ export function renderAuthScreen(container, onAuthSuccess) {
                     <p style="font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 16px;">
                         14-digit ABHA Number, @abdm address, OTP verification, or physical ABHA card scan with instant EHR sync.
                     </p>
-                    <button class="header-btn active" style="width: 100%; justify-content: center; height: 44px; font-size: 14px;">
-                        ${t.abhaLoginBtn} ➔
+                    <button class="header-btn active" style="width: 100%; justify-content: center; height: 44px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+                        <span>${t.abhaLoginBtn}</span>
+                        ${getIcon('arrow-right', { size: 14, color: '#ffffff' })}
                     </button>
                 </div>
 
                 <!-- 2. Phone + MPIN / Password -->
                 <div class="discipline-card" id="card-auth-phone" tabindex="0" role="button" style="padding: 28px 24px; text-align: left; align-items: flex-start; border-color: #cbd5e1; background: #ffffff;">
                     <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                        <div style="width: 60px; height: 60px; border-radius: 12px; background: #f1f5f9; border: 1.5px solid #64748b; display: flex; align-items: center; justify-content: center; font-size: 32px;">
-                            📱
+                        <div style="width: 60px; height: 60px; border-radius: 12px; background: #f1f5f9; border: 1.5px solid #64748b; display: flex; align-items: center; justify-content: center;">
+                            ${getIcon('smartphone', { size: 30, color: '#475569' })}
                         </div>
                         <div>
                             <div style="font-size: 20px; font-weight: 800; color: #0f172a;">${t.phoneLoginBtn}</div>
@@ -79,8 +82,9 @@ export function renderAuthScreen(container, onAuthSuccess) {
                     <p style="font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 16px;">
                         Login using registered mobile number and 4-digit MPIN or hospital patient portal password.
                     </p>
-                    <button class="header-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 14px; background: #f8fafc; border-color: #cbd5e1;">
-                        ${t.phoneLoginBtn} ➔
+                    <button class="header-btn" style="width: 100%; justify-content: center; height: 44px; font-size: 14px; background: #f8fafc; border-color: #cbd5e1; display: inline-flex; align-items: center; gap: 6px;">
+                        <span>${t.phoneLoginBtn}</span>
+                        ${getIcon('arrow-right', { size: 14, color: '#0f172a' })}
                     </button>
                 </div>
 
@@ -89,8 +93,8 @@ export function renderAuthScreen(container, onAuthSuccess) {
             <!-- 3. Quick 1-Tap Guest Walk-in Registration -->
             <div style="width: 100%; max-width: 900px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-lg); padding: 22px 28px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 52px; height: 52px; border-radius: 12px; background: #fffbeb; border: 1.5px solid #d97706; display: flex; align-items: center; justify-content: center; font-size: 28px;">
-                        ⚡
+                    <div style="width: 52px; height: 52px; border-radius: 12px; background: #fffbeb; border: 1.5px solid #d97706; display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('zap', { size: 28, color: '#d97706' })}
                     </div>
                     <div>
                         <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">${t.walkinBtn}</h3>

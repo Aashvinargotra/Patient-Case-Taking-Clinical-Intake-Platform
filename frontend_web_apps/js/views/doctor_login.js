@@ -4,6 +4,7 @@
  */
 import { portalState } from "../state.js";
 import { portalApi } from "../api.js";
+import { getIcon } from "../icons.js";
 
 export function renderDoctorLogin(container, onLoginSuccess) {
     container.innerHTML = `
@@ -12,8 +13,8 @@ export function renderDoctorLogin(container, onLoginSuccess) {
                 
                 <!-- Clinical Header Banner -->
                 <div style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%); padding: 32px 28px; color: #ffffff; text-align: center;">
-                    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px auto;">
-                        🩺
+                    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto;">
+                        ${getIcon('stethoscope', { size: 30, color: '#ffffff' })}
                     </div>
                     <h2 style="font-size: 22px; font-weight: 800; margin: 0; color: #ffffff;">Physician Clinical Console</h2>
                     <p style="margin: 6px 0 0 0; font-size: 13.5px; opacity: 0.95;">All India Institute of Ayurveda & Associated Hospitals</p>
@@ -24,27 +25,27 @@ export function renderDoctorLogin(container, onLoginSuccess) {
                     
                     <!-- Quick Switcher Doctor Pills -->
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
-                            ⚡ Quick Switch Doctor:
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
+                            ${getIcon('zap', { size: 14, color: '#0d9488' })} Quick Switch Doctor:
                         </label>
                         <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="doctor-quick-pills">
-                            <button type="button" class="btn-quick-doc" data-id="DOC-GENMED-01" data-pass="DoctorPass2026!" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0369a1; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                🩺 Dr. Priya Sen (Gen Med)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-GENMED-01" data-pass="DoctorPass2026!" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0369a1; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('stethoscope', { size: 13, color: '#0369a1' })} Dr. Priya Sen (Gen Med)
                             </button>
-                            <button type="button" class="btn-quick-doc" data-id="DOC-AYUSH-01" data-pass="DoctorPass2026!" style="background: #f0fdf4; border: 1px solid #86efac; color: #15803d; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                🌿 Dr. Ananya Sharma (Ayush)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-AYUSH-01" data-pass="DoctorPass2026!" style="background: #f0fdf4; border: 1px solid #86efac; color: #15803d; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('leaf', { size: 13, color: '#15803d' })} Dr. Ananya Sharma (Ayush)
                             </button>
-                            <button type="button" class="btn-quick-doc" data-id="DOC-CARDIO-01" data-pass="DoctorPass2026!" style="background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                ❤️ Dr. Vikram Malhotra (Cardio)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-CARDIO-01" data-pass="DoctorPass2026!" style="background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('activity', { size: 13, color: '#be123c' })} Dr. Vikram Malhotra (Cardio)
                             </button>
-                            <button type="button" class="btn-quick-doc" data-id="DOC-ORTHO-01" data-pass="DoctorPass2026!" style="background: #fefce8; border: 1px solid #fef08a; color: #a16207; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                🦴 Dr. Rajesh Verma (Ortho)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-ORTHO-01" data-pass="DoctorPass2026!" style="background: #fefce8; border: 1px solid #fef08a; color: #a16207; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('user', { size: 13, color: '#a16207' })} Dr. Rajesh Verma (Ortho)
                             </button>
-                            <button type="button" class="btn-quick-doc" data-id="DOC-DERMA-01" data-pass="DoctorPass2026!" style="background: #fdf2f8; border: 1px solid #fbcfe8; color: #9d174d; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                🧴 Dr. Neha Gupta (Derma)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-DERMA-01" data-pass="DoctorPass2026!" style="background: #fdf2f8; border: 1px solid #fbcfe8; color: #9d174d; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('user', { size: 13, color: '#9d174d' })} Dr. Neha Gupta (Derma)
                             </button>
-                            <button type="button" class="btn-quick-doc" data-id="DOC-PANCHAKARMA-01" data-pass="DoctorPass2026!" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-                                🍃 Dr. Harpreet Kaur (Panchakarma)
+                            <button type="button" class="btn-quick-doc" data-id="DOC-PANCHAKARMA-01" data-pass="DoctorPass2026!" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                ${getIcon('leaf', { size: 13, color: '#047857' })} Dr. Harpreet Kaur (Panchakarma)
                             </button>
                         </div>
                     </div>
@@ -73,14 +74,15 @@ export function renderDoctorLogin(container, onLoginSuccess) {
                         <div id="login-error-msg" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 6px;"></div>
 
                         <button type="submit" id="btn-submit-doc-login" class="btn btn-primary"
-                                style="padding: 14px 20px; font-size: 15px; font-weight: 800; margin-top: 6px;">
-                            <span>Sign In to Clinical Console ➔</span>
+                                style="padding: 14px 20px; font-size: 15px; font-weight: 800; margin-top: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span>Sign In to Clinical Console</span>
+                            ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
                         </button>
                     </form>
 
                     <!-- Credentials Reference Note -->
                     <div style="margin-top: 24px; padding: 12px 16px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: var(--radius-sm); font-size: 12px; color: #0f766e; line-height: 1.5;">
-                        <strong>🔑 Authorized Roster Credentials:</strong><br>
+                        <strong style="display: inline-flex; align-items: center; gap: 6px;">${getIcon('key', { size: 14, color: '#0f766e' })} Authorized Roster Credentials:</strong><br>
                         • All accounts use password: <code>DoctorPass2026!</code><br>
                         • Click any doctor pill above to auto-select that physician.
                     </div>
@@ -124,7 +126,7 @@ export function renderDoctorLogin(container, onLoginSuccess) {
             if (onLoginSuccess) onLoginSuccess(res);
         } catch (err) {
             submitBtn.disabled = false;
-            submitBtn.textContent = "Sign In to Clinical Console ➔";
+            submitBtn.innerHTML = `<span>Sign In to Clinical Console</span> ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}`;
             errorMsg.textContent = "Invalid Doctor ID or password. Please check your credentials.";
             errorMsg.style.display = "block";
         }

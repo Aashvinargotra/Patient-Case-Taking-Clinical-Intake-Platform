@@ -4,6 +4,7 @@
 import { PORTAL_CONFIG } from "./config.js";
 import { portalState } from "./state.js";
 import { portalApi } from "./api.js";
+import { getIcon } from "./icons.js";
 
 // Views
 import { renderDoctorLogin } from "./views/doctor_login.js";
@@ -37,14 +38,15 @@ class DoctorPortalApp {
 
     showLogin() {
         this.navContainer.innerHTML = `
-            <div style="padding: 12px; color: #64748b; font-size: 13px; text-align: center;">
-                🔒 Please sign in to access clinical records.
+            <div style="padding: 16px 12px; color: #64748b; font-size: 13px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                ${getIcon("lock", { size: 16, color: "#94a3b8" })}
+                <span>Doctor Authentication Required</span>
             </div>
         `;
         if (this.sidebarProfile) {
             this.sidebarProfile.innerHTML = `
                 <div style="font-size: 12px; color: #64748b; text-align: center; padding: 6px;">
-                    Doctor Authentication Required
+                    Please sign in to access records
                 </div>
             `;
         }
@@ -78,8 +80,8 @@ class DoctorPortalApp {
                             <div style="font-size: 11px; color: #0d9488; font-weight: 700;">${state.activeRoom}</div>
                         </div>
                     </div>
-                    <button id="btn-doc-logout" title="Sign Out" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; padding: 4px;">
-                        🚪
+                    <button id="btn-doc-logout" title="Sign Out" style="background: none; border: none; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; transition: background 0.15s ease;">
+                        ${getIcon("log-out", { size: 18, color: "#64748b" })}
                     </button>
                 </div>
             `;
@@ -95,13 +97,13 @@ class DoctorPortalApp {
 
     renderSidebarNav() {
         const navItems = [
-            { id: "QUEUE", icon: "📋", label: "My Assigned Patient Queue" },
-            { id: "CONSULTATION", icon: "🩺", label: "Active Consultation Cabin" }
+            { id: "QUEUE", icon: getIcon("clipboard-list", { size: 18 }), label: "My Assigned Patient Queue" },
+            { id: "CONSULTATION", icon: getIcon("stethoscope", { size: 18 }), label: "Active Consultation Cabin" }
         ];
 
         this.navContainer.innerHTML = navItems.map(item => `
-            <div class="nav-item ${this.currentTab === item.id ? 'active' : ''}" data-tab-id="${item.id}">
-                <span style="font-size: 18px;">${item.icon}</span>
+            <div class="nav-item ${this.currentTab === item.id ? 'active' : ''}" data-tab-id="${item.id}" style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: flex; align-items: center; justify-content: center;">${item.icon}</span>
                 <span>${item.label}</span>
             </div>
         `).join('');
@@ -150,8 +152,13 @@ class DoctorPortalApp {
             <div class="modal-overlay" role="dialog" aria-modal="true" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px);">
                 <div class="modal-dialog" style="width: 100%; max-width: 580px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 24px; box-shadow: 0 20px 50px rgba(15,23,42,0.25);">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                        <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">🔍 Quick Patient Case Lookup</h3>
-                        <button id="btn-close-search" style="background: none; border: none; font-size: 20px; color: #64748b; cursor: pointer;">✕</button>
+                        <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            ${getIcon('search', { size: 18, color: '#0d9488' })}
+                            <span>Quick Patient Case Lookup</span>
+                        </h3>
+                        <button id="btn-close-search" style="background: none; border: none; padding: 4px; color: #64748b; cursor: pointer; display: flex; align-items: center;">
+                            ${getIcon('x', { size: 18, color: '#64748b' })}
+                        </button>
                     </div>
                     <input type="text" id="input-modal-search" 
                            placeholder="Type Patient Name, ABHA ID, or Token Number..." 

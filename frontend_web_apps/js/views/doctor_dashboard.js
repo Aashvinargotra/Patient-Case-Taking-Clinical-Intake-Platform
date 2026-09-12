@@ -4,6 +4,7 @@
  */
 import { portalState } from "../state.js";
 import { portalApi } from "../api.js";
+import { getIcon } from "../icons.js";
 
 const unlockedPatients = new Map(); // patientId -> caseData
 let consultationTimerInterval = null;
@@ -38,8 +39,9 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
             <!-- Consultation Top Navigation Bar -->
             <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 24px; box-shadow: 0 2px 8px rgba(15,23,42,0.04);">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <button class="btn btn-outline" id="btn-back-to-queue" style="padding: 8px 16px; font-size: 13px;">
-                        ⬅️ Back to Patient Queue
+                    <button class="btn btn-outline" id="btn-back-to-queue" style="padding: 8px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;">
+                        ${getIcon("arrow-left", { size: 15 })}
+                        <span>Back to Patient Queue</span>
                     </button>
                     <div>
                         <span style="font-size: 12px; font-weight: 800; color: #0d9488; text-transform: uppercase;">
@@ -55,26 +57,33 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
                     <!-- Live Consultation Duration Stopwatch -->
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div id="consultation-timer-box" style="display: flex; align-items: center; gap: 8px; background: #f0fdfa; border: 1.5px solid #99f6e4; color: #0d9488; padding: 6px 18px; border-radius: 9999px; font-size: 14px; font-weight: 800;">
-                            <span>⏱️ Consultation Duration:</span>
+                            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                ${getIcon("clock", { size: 15, color: "#0d9488" })}
+                                <span>Consultation Duration:</span>
+                            </span>
                             <span id="consultation-timer-display" style="font-family: monospace; font-size: 16px; font-weight: 900;">00:00</span>
                         </div>
-                        <button class="btn btn-success" id="btn-sign-complete" style="font-weight: 800; font-size: 14px; padding: 10px 22px;">
-                            ✅ Sign-Off & Complete Consultation
+                        <button class="btn btn-success" id="btn-sign-complete" style="font-weight: 800; font-size: 14px; padding: 10px 22px; display: inline-flex; align-items: center; gap: 8px;">
+                            ${getIcon("check-circle", { size: 16, color: "#ffffff" })}
+                            <span>Sign-Off & Complete Consultation</span>
                         </button>
                     </div>
                 ` : `
-                    <span class="badge badge-amber">🔒 Patient Record Locked</span>
+                    <span class="badge badge-amber" style="display: inline-flex; align-items: center; gap: 6px;">
+                        ${getIcon("lock", { size: 13, color: "#b45309" })}
+                        <span>Patient Record Locked</span>
+                    </span>
                 `}
             </div>
 
             ${!isUnlocked ? `
                 <!-- ========================================== -->
-                <!-- 🔒 SECURITY UNLOCK BARRIER (QR / PIN GATE) -->
+                <!-- SECURITY UNLOCK BARRIER (QR / PIN GATE)    -->
                 <!-- ========================================== -->
                 <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 48px 24px; text-align: center; box-shadow: 0 4px 16px rgba(15,23,42,0.04); display: flex; flex-direction: column; align-items: center;">
                     
-                    <div style="width: 72px; height: 72px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 18px;">
-                        🛡️
+                    <div style="width: 72px; height: 72px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d97706; margin-bottom: 18px;">
+                        ${getIcon("shield-check", { size: 36, color: "#d97706" })}
                     </div>
 
                     <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
@@ -96,16 +105,18 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
                     <!-- Unlock Controls Box -->
                     <div style="width: 100%; max-width: 440px; background: #ffffff; border: 2px solid #0d9488; border-radius: var(--radius-md); padding: 24px; box-shadow: 0 10px 25px rgba(13,148,136,0.08);">
                         
-                        <label style="display: block; font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; text-align: left;">
-                            🔢 Enter 4-Digit Token PIN / Token Number:
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; text-align: left;">
+                            ${getIcon("hash", { size: 15, color: "#0d9488" })}
+                            <span>Enter 4-Digit Token PIN / Token Number:</span>
                         </label>
                         <div style="display: flex; gap: 10px; margin-bottom: 16px;">
                             <input type="text" id="input-token-pin" maxlength="6" 
                                    placeholder="e.g. ${currentPatient.token_number || '101'}" 
                                    value="${currentPatient.token_number || ''}"
                                    style="flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 18px; font-weight: 800; text-align: center; letter-spacing: 2px; outline: none;">
-                            <button class="btn btn-primary" id="btn-unlock-pin" style="padding: 0 24px; font-weight: 800; font-size: 14px;">
-                                Unlock ➔
+                            <button class="btn btn-primary" id="btn-unlock-pin" style="padding: 0 24px; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span>Unlock</span>
+                                ${getIcon("arrow-right", { size: 14 })}
                             </button>
                         </div>
 
@@ -116,21 +127,22 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
                         </div>
 
                         <button class="btn" id="btn-scan-qr" style="width: 100%; background: #f0fdfa; color: #0d9488; border: 1.5px solid #99f6e4; padding: 12px; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <span>📷 Scan Patient Slip QR Code</span>
+                            ${getIcon("camera", { size: 18, color: "#0d9488" })}
+                            <span>Scan Patient Slip QR Code</span>
                         </button>
                     </div>
 
                 </div>
             ` : `
                 <!-- ========================================== -->
-                <!-- 🔓 UNLOCKED CLINICAL CASE SHEET & EDITOR   -->
+                <!-- UNLOCKED CLINICAL CASE SHEET & EDITOR      -->
                 <!-- ========================================== -->
                 
                 <!-- Patient Demographic Banner -->
                 <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(15,23,42,0.04);">
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <div style="width: 48px; height: 48px; border-radius: 50%; background: #f0fdfa; border: 2px solid #99f6e4; display: flex; align-items: center; justify-content: center; font-size: 22px;">
-                            ${caseData.patient.gender === 'F' ? '👩' : '👨'}
+                        <div style="width: 48px; height: 48px; border-radius: 50%; background: #f0fdfa; border: 2px solid #99f6e4; display: flex; align-items: center; justify-content: center; color: #0d9488;">
+                            ${getIcon("user", { size: 24, color: "#0d9488" })}
                         </div>
                         <div>
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -148,8 +160,9 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
                             </div>
                         </div>
                     </div>
-                    <span class="badge badge-green" style="font-size: 13px; padding: 6px 14px;">
-                        🟢 Active in Cabin
+                    <span class="badge badge-green" style="font-size: 12px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                        <span>Active in Cabin</span>
                     </span>
                 </div>
 
@@ -163,7 +176,7 @@ export async function renderDoctorDashboard(container, onReturnToQueue = null) {
                         <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 20px; box-shadow: 0 2px 8px rgba(15,23,42,0.04);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 10px;">
                                 <h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                    <span>📋</span>
+                                    <span style="display: inline-flex; align-items: center; color: #0284c7;">${getIcon("clipboard-list", { size: 18, color: "#0284c7" })}</span>
                                     <span>AI Pre-Consultation Clinical Intake Summary (Patient-Reported)</span>
                                 </h4>
                                 <span class="badge badge-blue">DRAFT SUMMARY</span>
@@ -177,24 +190,24 @@ ${caseData.current_summary ? caseData.current_summary.draft_summary_text : 'Pre-
                         <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 20px; box-shadow: 0 2px 8px rgba(15,23,42,0.04);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                                 <h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                    <span>✍️</span>
+                                    <span style="display: inline-flex; align-items: center; color: #0d9488;">${getIcon("edit-3", { size: 18, color: "#0d9488" })}</span>
                                     <span>Attending Physician Clinical Notes, Diagnosis & Prescription:</span>
                                 </h4>
                                 <span id="doc-mic-status" style="font-size: 12px; font-weight: 700; color: #ef4444; display: none; align-items: center; gap: 6px;">
                                     <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                                    <span>🔴 Listening... Speak consultation</span>
+                                    <span>Listening... Speak consultation</span>
                                 </span>
                             </div>
 
                             <div style="position: relative;">
                                 <textarea id="doctor-notes-input" rows="5" class="form-input"
-                                          placeholder="Enter confirmed diagnosis, Ayurvedic/Allopathic prescription, dosage regimen, and follow-up advice (or click 🎙️ to dictate)..."
+                                          placeholder="Enter confirmed diagnosis, Ayurvedic/Allopathic prescription, dosage regimen, and follow-up advice (or click mic to dictate)..."
                                           style="line-height: 1.6; resize: vertical; padding-right: 50px; padding-bottom: 30px; font-size: 14px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); padding: 12px; box-sizing: border-box;"></textarea>
 
                                 <!-- Floating Dictation Mic Button at Bottom-Right -->
                                 <button type="button" id="btn-doc-mic" title="Live Voice Dictation (Speak notes)"
-                                        style="position: absolute; right: 12px; bottom: 14px; width: 38px; height: 38px; border-radius: 50%; background: #f0fdfa; border: 1.5px solid #0d9488; color: #0d9488; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(13,148,136,0.18); z-index: 5;">
-                                    🎙️
+                                        style="position: absolute; right: 12px; bottom: 14px; width: 38px; height: 38px; border-radius: 50%; background: #f0fdfa; border: 1.5px solid #0d9488; color: #0d9488; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(13,148,136,0.18); z-index: 5;">
+                                    ${getIcon("mic", { size: 18, color: "currentColor" })}
                                 </button>
                             </div>
 
@@ -216,7 +229,7 @@ ${caseData.current_summary ? caseData.current_summary.draft_summary_text : 'Pre-
                         <!-- Abnormal Labs Panel -->
                         <div style="background: #ffffff; border: 1.5px solid #fee2e2; border-radius: var(--radius-md); padding: 18px; box-shadow: 0 2px 8px rgba(239,68,68,0.04);">
                             <h4 style="font-size: 14px; font-weight: 800; color: #b91c1c; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                                <span>⚠️</span>
+                                <span style="display: inline-flex; align-items: center; color: #b91c1c;">${getIcon("alert-triangle", { size: 16, color: "#b91c1c" })}</span>
                                 <span>Abnormal Lab Callouts</span>
                             </h4>
                             ${caseData.abnormal_investigations.length === 0 ? `
@@ -234,13 +247,16 @@ ${caseData.current_summary ? caseData.current_summary.draft_summary_text : 'Pre-
                         <!-- Longitudinal Medical Timeline -->
                         <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: var(--radius-md); padding: 18px; box-shadow: 0 2px 8px rgba(15,23,42,0.04);">
                             <h4 style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                                <span>🕒</span>
-                                <span>Longitudinal Timeline</span>
+                                <span style="display: inline-flex; align-items: center; color: #0d9488;">${getIcon("clock", { size: 16, color: "#0d9488" })}</span>
+                                <span>Longitudinal Medical Timeline</span>
                             </h4>
                             <div style="display: flex; flex-direction: column; gap: 12px;">
                                 ${caseData.timeline.map(t => `
                                     <div style="border-left: 2px solid #0d9488; padding-left: 10px;">
-                                        <div style="font-size: 11px; font-weight: 700; color: #0d9488;">${new Date(t.timestamp).toLocaleDateString()}</div>
+                                        <div style="font-size: 11px; font-weight: 700; color: #0d9488; display: flex; align-items: center; gap: 5px;">
+                                            ${getIcon("calendar", { size: 12, color: "#0d9488" })}
+                                            <span>${new Date(t.timestamp).toLocaleDateString()}</span>
+                                        </div>
                                         <div style="font-size: 13px; font-weight: 800; color: #0f172a;">${t.title}</div>
                                         <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${t.description}</div>
                                     </div>
@@ -286,7 +302,7 @@ ${caseData.current_summary ? caseData.current_summary.draft_summary_text : 'Pre-
     if (scanQrBtn) {
         scanQrBtn.addEventListener("click", async () => {
             scanQrBtn.disabled = true;
-            scanQrBtn.textContent = "📷 Reading Camera QR...";
+            scanQrBtn.innerHTML = `${getIcon('camera', { size: 14, color: '#0d9488' })} Reading Camera QR...`;
 
             setTimeout(async () => {
                 const unlockedCase = await portalApi.verifyPatientToken(activeDocId, {
@@ -366,7 +382,7 @@ ${caseData.current_summary ? caseData.current_summary.draft_summary_text : 'Pre-
             } catch (e) {}
 
             stopConsultationTimer();
-            alert(`✅ Consultation Completed & Signed!\nPatient: ${caseData.patient.full_name} (Token #${currentPatient.token_number})\nAttending Doctor: ${activeDocName}\nDuration: ${Math.floor(durationSecs / 60)}m ${durationSecs % 60}s\nCase sheet signed and transmitted to patient ABHA record.`);
+            alert(`[SUCCESS] Consultation Completed & Signed!\nPatient: ${caseData.patient.full_name} (Token #${currentPatient.token_number})\nAttending Doctor: ${activeDocName}\nDuration: ${Math.floor(durationSecs / 60)}m ${durationSecs % 60}s\nCase sheet signed and transmitted to patient ABHA record.`);
             
             // Remove unlocked status for this patient
             unlockedPatients.delete(selectedPatientId);

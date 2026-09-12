@@ -4,6 +4,7 @@
  */
 import { kioskState } from "../state.js";
 import { apiService } from "../api_service.js";
+import { getIcon } from "../icons.js";
 
 export function renderAbhaAuthModal(container, onSuccess, onCancel) {
     const modalEl = document.createElement("div");
@@ -14,13 +15,17 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
         <div class="modal-dialog">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 28px;">🪪</span>
+                    <div style="width: 44px; height: 44px; border-radius: 10px; background: #f0fdfa; display: flex; align-items: center; justify-content: center;">
+                        ${getIcon('id-card', { size: 24, color: '#0d9488' })}
+                    </div>
                     <div>
                         <h3 style="font-size: var(--font-size-lg); font-weight: 800; color: #0f172a; margin: 0;">ABDM Ayushman Bharat Digital Mission</h3>
                         <p style="font-size: 13px; color: #64748b; margin: 0;">ABHA ID Authentication & Instant Registration Gateway</p>
                     </div>
                 </div>
-                <button id="btn-close-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; padding: 4px 8px;">✕</button>
+                <button id="btn-close-modal" aria-label="Close modal" style="background: none; border: none; cursor: pointer; color: #64748b; padding: 4px 8px; display: flex; align-items: center; justify-content: center;">
+                    ${getIcon('x', { size: 20, color: '#64748b' })}
+                </button>
             </div>
 
             <div class="modal-body">
@@ -50,15 +55,18 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                             </button>
                         </div>
 
-                        <button id="btn-send-otp" class="header-btn active" style="width: 100%; height: 50px; justify-content: center; font-size: 16px;">
-                            Send ABDM Mobile OTP ➔
+                        <button id="btn-send-otp" class="header-btn active" style="width: 100%; height: 50px; justify-content: center; font-size: 16px; display: inline-flex; align-items: center; gap: 8px;">
+                            <span>Send ABDM Mobile OTP</span>
+                            ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
                         </button>
                     </div>
 
                     <!-- OTP Input Box (Hidden initially) -->
                     <div id="step-otp-verify" style="display: none; animation: fade-in 200ms ease;">
                         <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 20px;">📩</span>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                ${getIcon('message-square', { size: 20, color: '#166534' })}
+                            </div>
                             <span style="font-size: 14px; color: #166534; font-weight: 600;" id="otp-status-msg">
                                 OTP sent to mobile ending with **78 (Demo OTP: 123456)
                             </span>
@@ -70,8 +78,9 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                         <input type="text" id="input-otp" placeholder="123456" maxlength="6" value="123456"
                                style="width: 100%; height: 50px; border-radius: 8px; border: 2px solid #0d9488; font-size: 22px; letter-spacing: 8px; text-align: center; font-weight: 800; margin-bottom: 16px;" />
 
-                        <button id="btn-verify-otp" class="header-btn active" style="width: 100%; height: 50px; justify-content: center; font-size: 16px;">
-                            Verify & Proceed to Intake ➔
+                        <button id="btn-verify-otp" class="header-btn active" style="width: 100%; height: 50px; justify-content: center; font-size: 16px; display: inline-flex; align-items: center; gap: 8px;">
+                            <span>Verify & Proceed to Intake</span>
+                            ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
                         </button>
                     </div>
                 </div>
@@ -109,8 +118,9 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                             <input type="text" id="reg-abha-addr" placeholder="priya.sharma95@abdm" value="priya.sharma95@abdm"
                                    style="width: 100%; height: 44px; border-radius: 8px; border: 1.5px solid #cbd5e1; padding: 0 14px; font-size: 15px;" />
                         </div>
-                        <button id="btn-submit-register" class="header-btn active" style="width: 100%; height: 48px; justify-content: center; font-size: 15px; margin-top: 8px;">
-                            Create ABHA & Start Consultation ➔
+                        <button id="btn-submit-register" class="header-btn active" style="width: 100%; height: 48px; justify-content: center; font-size: 15px; margin-top: 8px; display: inline-flex; align-items: center; gap: 8px;">
+                            <span>Create ABHA & Start Consultation</span>
+                            ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
                         </button>
                     </div>
                 </div>
@@ -118,14 +128,18 @@ export function renderAbhaAuthModal(container, onSuccess, onCancel) {
                 <!-- 3. ABHA QR Scanner Pane -->
                 <div id="pane-scan" style="display: none; text-align: center; padding: 12px 0;">
                     <div style="width: 200px; height: 200px; border: 3px dashed #0d9488; border-radius: 16px; margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f0fdfa; position: relative;">
-                        <span style="font-size: 64px;">📷</span>
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            ${getIcon('camera', { size: 54, color: '#0d9488' })}
+                        </div>
                         <div style="position: absolute; width: 100%; height: 2px; background: #ef4444; top: 50%; animation: scan-line 2s infinite ease-in-out;"></div>
                     </div>
                     <p style="font-size: 14px; color: #475569; margin-bottom: 16px;">
                         Align physical ABHA Card QR code in front of the kiosk optical scanner
                     </p>
-                    <button id="btn-simulate-qr" class="header-btn active" style="width: 100%; height: 48px; justify-content: center; font-size: 15px;">
-                        ⚡ Simulate ABHA QR Scan ➔
+                    <button id="btn-simulate-qr" class="header-btn active" style="width: 100%; height: 48px; justify-content: center; font-size: 15px; display: inline-flex; align-items: center; gap: 8px;">
+                        ${getIcon('zap', { size: 16, color: '#ffffff' })}
+                        <span>Simulate ABHA QR Scan</span>
+                        ${getIcon('arrow-right', { size: 16, color: '#ffffff' })}
                     </button>
                 </div>
 

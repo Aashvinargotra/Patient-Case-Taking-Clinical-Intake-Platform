@@ -2,6 +2,7 @@
  * MediKiosk Hospital Administration & Analytics Dashboard (Phase 4.5)
  */
 import { portalApi } from "../api.js";
+import { getIcon } from "../icons.js";
 
 export async function renderAdminAnalytics(container) {
     const kpis = await portalApi.getAdminAnalytics();
@@ -15,7 +16,9 @@ export async function renderAdminAnalytics(container) {
                     <h2 style="font-size: 22px; font-weight: 800; color: #ffffff;">Hospital Administration & Intake Analytics</h2>
                     <p style="font-size: 13px; color: var(--portal-text-muted);">Real-time OPD intake throughput, completion metrics, and tamper-evident audit logs.</p>
                 </div>
-                <button class="btn btn-secondary" id="btn-export-audit">📥 Export Audit Logs</button>
+                <button class="btn btn-secondary" id="btn-export-audit" style="display: inline-flex; align-items: center; gap: 6px;">
+                    ${getIcon('download', { size: 14, color: 'currentColor' })} Export Audit Logs
+                </button>
             </div>
 
             <!-- KPI Metric Cards -->
@@ -45,7 +48,10 @@ export async function renderAdminAnalytics(container) {
             <!-- Tamper-Evident Audit Log Table -->
             <div style="background: var(--portal-card); border: 1px solid var(--portal-border); border-radius: var(--radius-md); overflow: hidden;">
                 <div style="padding: 16px 20px; border-bottom: 1px solid var(--portal-border); display: flex; align-items: center; justify-content: space-between;">
-                    <h3 style="font-size: 15px; font-weight: 700; color: #ffffff;">🔒 Immutable Audit Log Trail (DPDP & HIPAA Compliance)</h3>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 6px;">
+                        ${getIcon('lock', { size: 16, color: '#38bdf8' })}
+                        <span>Immutable Audit Log Trail (DPDP & HIPAA Compliance)</span>
+                    </h3>
                     <span class="badge badge-green">SHA-256 Chained</span>
                 </div>
                 <table class="portal-table">

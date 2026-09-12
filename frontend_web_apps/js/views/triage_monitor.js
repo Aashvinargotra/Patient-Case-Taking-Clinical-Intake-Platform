@@ -3,6 +3,7 @@
  */
 import { portalState } from "../state.js";
 import { portalApi } from "../api.js";
+import { getIcon } from "../icons.js";
 
 export async function renderTriageMonitor(container) {
     const alerts = await portalApi.getActiveTriageAlerts();
@@ -16,8 +17,12 @@ export async function renderTriageMonitor(container) {
                     <p style="font-size: 13px; color: var(--portal-text-muted);">Real-time WebSocket listener with instant desktop buzzer and re-routing capabilities.</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-secondary" id="btn-refresh-triage">🔄 Refresh Feed</button>
-                    <button class="btn btn-danger" id="btn-test-buzzer">🚨 Test Audio Buzzer</button>
+                    <button class="btn btn-secondary" id="btn-refresh-triage" style="display: inline-flex; align-items: center; gap: 6px;">
+                        ${getIcon('refresh-cw', { size: 14, color: 'currentColor' })} Refresh Feed
+                    </button>
+                    <button class="btn btn-danger" id="btn-test-buzzer" style="display: inline-flex; align-items: center; gap: 6px;">
+                        ${getIcon('alert-circle', { size: 14, color: 'currentColor' })} Test Audio Buzzer
+                    </button>
                 </div>
             </div>
 
@@ -27,8 +32,8 @@ export async function renderTriageMonitor(container) {
                     <div class="triage-alert-card ${alt.severity_tier === 'RED' ? 'tier-red' : 'tier-amber'}">
                         <div>
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                                <span class="badge ${alt.severity_tier === 'RED' ? 'badge-red' : 'badge-amber'}">
-                                    ${alt.severity_tier === 'RED' ? '🚨 TIER-1 CRITICAL EMERGENCY' : '⚠️ TIER-2 HIGH PRIORITY'}
+                                <span class="badge ${alt.severity_tier === 'RED' ? 'badge-red' : 'badge-amber'}" style="display: inline-flex; align-items: center; gap: 5px;">
+                                    ${alt.severity_tier === 'RED' ? `${getIcon('alert-circle', { size: 14, color: '#b91c1c' })} TIER-1 CRITICAL EMERGENCY` : `${getIcon('alert-triangle', { size: 14, color: '#b45309' })} TIER-2 HIGH PRIORITY`}
                                 </span>
                                 <span style="font-size: 13px; color: var(--portal-text-muted);">Rule: ${alt.rule_id}</span>
                             </div>
@@ -41,11 +46,11 @@ export async function renderTriageMonitor(container) {
                         </div>
 
                         <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-secondary btn-reroute" data-alt-id="${alt.alert_id}">
-                                🔀 Re-Route Dept
+                            <button class="btn btn-secondary btn-reroute" data-alt-id="${alt.alert_id}" style="display: inline-flex; align-items: center; gap: 6px;">
+                                ${getIcon('activity', { size: 14, color: 'currentColor' })} Re-Route Dept
                             </button>
-                            <button class="btn btn-primary btn-ack" data-alt-id="${alt.alert_id}">
-                                ✓ Acknowledge & Dispatch
+                            <button class="btn btn-primary btn-ack" data-alt-id="${alt.alert_id}" style="display: inline-flex; align-items: center; gap: 6px;">
+                                ${getIcon('check', { size: 14, color: 'currentColor' })} Acknowledge & Dispatch
                             </button>
                         </div>
                     </div>
@@ -66,7 +71,7 @@ export async function renderTriageMonitor(container) {
         gain.connect(audioCtx.destination);
         osc.start();
         setTimeout(() => osc.stop(), 500);
-        alert("🚨 EMERGENCY BUZZER TRIGGERED: Alert sent to Emergency Red Zone desk.");
+        alert("EMERGENCY BUZZER TRIGGERED: Alert sent to Emergency Red Zone desk.");
     });
 
     container.querySelector("#btn-refresh-triage").addEventListener("click", () => {
