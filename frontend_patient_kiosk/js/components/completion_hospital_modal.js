@@ -214,6 +214,28 @@ export function renderCompletionHospitalFlow(container, onFinished) {
 
         const res = await apiService.finalizeSession(payload);
         
+        // Notify doctor console immediately across tabs/windows
+        try {
+            if (typeof BroadcastChannel !== "undefined") {
+                const bc = new BroadcastChannel("medikiosk_opd_sync");
+                bc.postMessage({
+                    type: "NEW_PATIENT_TOKEN",
+                    token_number: res.token_number,
+                    patient_id: res.patient_id,
+                    department_id: res.assigned_department_id,
+                    timestamp: Date.now()
+                });
+                bc.close();
+            }
+            localStorage.setItem("medikiosk_last_token_sync", JSON.stringify({
+                time: Date.now(),
+                token: res.token_number,
+                dept: res.assigned_department_id
+            }));
+        } catch (e) {
+            console.warn("[Kiosk] Cross-window sync trigger error:", e);
+        }
+
         kioskState.setState({
             selectedHospitalId: selectedHospitalId,
             selectedHospitalName: hospName,

@@ -22,14 +22,41 @@ export function renderDoctorLogin(container, onLoginSuccess) {
                 <!-- Secure Authentication Form -->
                 <div style="padding: 32px 28px;">
                     
+                    <!-- Quick Switcher Doctor Pills -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
+                            ⚡ Quick Switch Doctor:
+                        </label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="doctor-quick-pills">
+                            <button type="button" class="btn-quick-doc" data-id="DOC-GENMED-01" data-pass="DoctorPass2026!" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0369a1; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                🩺 Dr. Priya Sen (Gen Med)
+                            </button>
+                            <button type="button" class="btn-quick-doc" data-id="DOC-AYUSH-01" data-pass="DoctorPass2026!" style="background: #f0fdf4; border: 1px solid #86efac; color: #15803d; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                🌿 Dr. Ananya Sharma (Ayush)
+                            </button>
+                            <button type="button" class="btn-quick-doc" data-id="DOC-CARDIO-01" data-pass="DoctorPass2026!" style="background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                ❤️ Dr. Vikram Malhotra (Cardio)
+                            </button>
+                            <button type="button" class="btn-quick-doc" data-id="DOC-ORTHO-01" data-pass="DoctorPass2026!" style="background: #fefce8; border: 1px solid #fef08a; color: #a16207; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                🦴 Dr. Rajesh Verma (Ortho)
+                            </button>
+                            <button type="button" class="btn-quick-doc" data-id="DOC-DERMA-01" data-pass="DoctorPass2026!" style="background: #fdf2f8; border: 1px solid #fbcfe8; color: #9d174d; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                🧴 Dr. Neha Gupta (Derma)
+                            </button>
+                            <button type="button" class="btn-quick-doc" data-id="DOC-PANCHAKARMA-01" data-pass="DoctorPass2026!" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 5px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                                🍃 Dr. Harpreet Kaur (Panchakarma)
+                            </button>
+                        </div>
+                    </div>
+
                     <form id="form-doc-login" style="display: flex; flex-direction: column; gap: 18px;">
                         <div>
                             <label style="display: block; font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
                                 Doctor ID / Medical Registration Number
                             </label>
                             <input type="text" id="input-doc-id" required 
-                                   placeholder="e.g. DOC-AYUSH-01 or MCI-48912-DL"
-                                   value="DOC-AYUSH-01"
+                                   placeholder="e.g. DOC-GENMED-01 or DOC-AYUSH-01"
+                                   value="DOC-GENMED-01"
                                    style="width: 100%; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; outline: none;">
                         </div>
 
@@ -53,10 +80,9 @@ export function renderDoctorLogin(container, onLoginSuccess) {
 
                     <!-- Credentials Reference Note -->
                     <div style="margin-top: 24px; padding: 12px 16px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: var(--radius-sm); font-size: 12px; color: #0f766e; line-height: 1.5;">
-                        <strong>🔑 Authorized Doctor Logins:</strong><br>
-                        • <strong>Dr. Ananya Sharma:</strong> <code>DOC-AYUSH-01</code> (Kayachikitsa OPD)<br>
-                        • <strong>Dr. Vikram Malhotra:</strong> <code>DOC-CARDIO-01</code> (Cardiology OPD)<br>
-                        • <em>Password:</em> <code>DoctorPass2026!</code>
+                        <strong>🔑 Authorized Roster Credentials:</strong><br>
+                        • All accounts use password: <code>DoctorPass2026!</code><br>
+                        • Click any doctor pill above to auto-select that physician.
                     </div>
 
                 </div>
@@ -64,6 +90,14 @@ export function renderDoctorLogin(container, onLoginSuccess) {
             </div>
         </div>
     `;
+
+    // Quick fill handlers
+    container.querySelectorAll(".btn-quick-doc").forEach(btn => {
+        btn.addEventListener("click", () => {
+            container.querySelector("#input-doc-id").value = btn.dataset.id;
+            container.querySelector("#input-doc-pass").value = btn.dataset.pass;
+        });
+    });
 
     container.querySelector("#form-doc-login").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -83,7 +117,7 @@ export function renderDoctorLogin(container, onLoginSuccess) {
                 activeDoctorName: res.full_name,
                 activeDepartment: res.department_id,
                 activeDepartmentName: res.department_name,
-                activeRoom: res.floor_room,
+                activeRoom: res.floor_room || res.assigned_room || "Room 102",
                 isLoggedIn: true
             });
 

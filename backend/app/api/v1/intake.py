@@ -297,6 +297,8 @@ async def finalize_intake_session(req: FinalizeIntakeRequest, db: AsyncSession =
         "department": dept_info["name"],
         "assigned_room": dept_info["room"],
         "room": dept_info["room"],
+        "assigned_doctor_id": dept_info.get("assigned_doctor_id", "DOC-GENMED-01"),
+        "assigned_doctor_name": dept_info.get("assigned_doctor_name", "Attending Duty Physician"),
         "priority_tier": priority_tier,
         "signed_qr_token": signed_qr,
         "signed_qr_payload": signed_qr,

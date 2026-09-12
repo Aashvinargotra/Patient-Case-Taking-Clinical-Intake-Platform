@@ -122,11 +122,14 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
 
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <select id="select-queue-dept" style="background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; outline: none;">
-                            <option value="${activeDept}">Current Department (${activeDept})</option>
-                            <option value="ALL">All Hospital Departments</option>
+                            <option value="${activeDept}">👨‍⚕️ My Department (${activeDept})</option>
+                            <option value="ALL">🏥 All Hospital Departments</option>
+                            <option value="GEN_MED">General Medicine OPD</option>
                             <option value="KAYACHIKITSA">Kayachikitsa (Ayurveda)</option>
                             <option value="CARDIOLOGY">Cardiology OPD</option>
-                            <option value="GEN_MED">General Medicine OPD</option>
+                            <option value="ORTHOPAEDICS">Orthopaedics OPD</option>
+                            <option value="PANCHAKARMA">Panchakarma OPD</option>
+                            <option value="DERMATOLOGY">Dermatology OPD</option>
                             <option value="EMERGENCY">Emergency Triage</option>
                         </select>
                         <input type="text" id="input-queue-filter" placeholder="🔍 Search Token # or Patient Name..." 
@@ -161,6 +164,7 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
     const tbody = container.querySelector("#queue-tbody");
     const totalStatEl = container.querySelector("#stat-total-waiting");
     const urgentStatEl = container.querySelector("#stat-urgent-cases");
+    const syncBadge = container.querySelector("#live-sync-indicator");
 
     function applySearchFilter() {
         const query = filterInput ? filterInput.value.toLowerCase().trim() : "";
@@ -192,10 +196,7 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
             if (btn) {
                 const patId = btn.getAttribute("data-pat-id");
                 portalState.setState({ selectedPatientId: patId });
-                if (queuePollInterval) {
-                    clearInterval(queuePollInterval);
-                    queuePollInterval = null;
-                }
+                cleanup();
                 if (onSelectPatientToConsult) {
                     onSelectPatientToConsult(patId);
                 }
@@ -203,12 +204,11 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
         });
     }
 
+    let previousTotalCount = initialMetrics.total;
+
     async function refreshQueue() {
         if (!container.isConnected) {
-            if (queuePollInterval) {
-                clearInterval(queuePollInterval);
-                queuePollInterval = null;
-            }
+            cleanup();
             return;
         }
 
@@ -223,11 +223,61 @@ export async function renderDoctorQueueView(container, onSelectPatientToConsult)
                 tbody.innerHTML = renderRowsHtml(latestQueue);
                 applySearchFilter();
             }
+
+            // Flash sync badge if patient count changed or new patient arrived
+            if (metrics.total > previousTotalCount && syncBadge) {
+                syncBadge.style.background = "#dcfce7";
+                syncBadge.style.borderColor = "#22c55e";
+                syncBadge.innerHTML = `<span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block;"></span> ⚡ NEW PATIENT ARRIVED`;
+                setTimeout(() => {
+                    if (syncBadge && container.isConnected) {
+                        syncBadge.style.background = "#ecfdf5";
+                        syncBadge.style.borderColor = "#6ee7b7";
+                        syncBadge.innerHTML = `<span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span> LIVE REAL-TIME SYNC`;
+                    }
+                }, 3000);
+            }
+            previousTotalCount = metrics.total;
         } catch (err) {
             console.warn("[DoctorQueueView] Polling refresh skipped:", err);
         }
     }
 
-    // Set up Real-Time Live Polling (every 2.5 seconds)
-    queuePollInterval = setInterval(refreshQueue, 2500);
+    // Real-Time Cross-Tab Event Bus
+    let syncChannel = null;
+    if (typeof BroadcastChannel !== "undefined") {
+        try {
+            syncChannel = new BroadcastChannel("medikiosk_opd_sync");
+            syncChannel.onmessage = (ev) => {
+                console.log("[DoctorQueueView] Instant OPD sync message received:", ev.data);
+                refreshQueue();
+            };
+        } catch (e) {
+            console.warn("[DoctorQueueView] BroadcastChannel init error:", e);
+        }
+    }
+
+    // Cross-tab storage event fallback
+    function handleStorageSync(e) {
+        if (e.key === "medikiosk_last_token_sync" || e.key === "medikiosk_opd_token_updated") {
+            console.log("[DoctorQueueView] Instant storage sync triggered");
+            refreshQueue();
+        }
+    }
+    window.addEventListener("storage", handleStorageSync);
+
+    function cleanup() {
+        if (queuePollInterval) {
+            clearInterval(queuePollInterval);
+            queuePollInterval = null;
+        }
+        if (syncChannel) {
+            syncChannel.close();
+            syncChannel = null;
+        }
+        window.removeEventListener("storage", handleStorageSync);
+    }
+
+    // Set up Real-Time Live Polling (every 1.5 seconds)
+    queuePollInterval = setInterval(refreshQueue, 1500);
 }

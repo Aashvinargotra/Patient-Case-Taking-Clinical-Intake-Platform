@@ -123,6 +123,18 @@ INITIAL_DEPARTMENTS = [
 # 2. Default Hospital Doctors
 INITIAL_DOCTORS = [
     {
+        "doctor_id": "DOC-GENMED-01",
+        "full_name": "Dr. Priya Sen",
+        "medical_registration_number": "MCI-61024-DL",
+        "department_id": "GEN_MED",
+        "is_on_duty": True,
+        "duty_phone_encrypted": encrypt_phone("+919870000004"),
+        "password_hash": hash_password("DoctorPass2026!"),
+        "mfa_secret": "JBSWY3DPEHPK3PXP",
+        "sso_subject_id": "sso-doc-sen-004",
+        "is_active": True
+    },
+    {
         "doctor_id": "DOC-CARDIO-01",
         "full_name": "Dr. Vikram Malhotra",
         "medical_registration_number": "MCI-48912-DL",
@@ -132,6 +144,18 @@ INITIAL_DOCTORS = [
         "password_hash": hash_password("DoctorPass2026!"),
         "mfa_secret": "JBSWY3DPEHPK3PXP", # Standard TOTP secret for demo testing
         "sso_subject_id": "sso-doc-malhotra-001",
+        "is_active": True
+    },
+    {
+        "doctor_id": "DOC-ORTHO-01",
+        "full_name": "Dr. Rajesh Verma",
+        "medical_registration_number": "MCI-55102-DL",
+        "department_id": "ORTHOPEDICS",
+        "is_on_duty": True,
+        "duty_phone_encrypted": encrypt_phone("+919870000003"),
+        "password_hash": hash_password("DoctorPass2026!"),
+        "mfa_secret": "JBSWY3DPEHPK3PXP",
+        "sso_subject_id": "sso-doc-verma-003",
         "is_active": True
     },
     {
@@ -147,15 +171,39 @@ INITIAL_DOCTORS = [
         "is_active": True
     },
     {
-        "doctor_id": "DOC-ORTHO-01",
-        "full_name": "Dr. Rajesh Verma",
-        "medical_registration_number": "MCI-55102-DL",
-        "department_id": "ORTHOPEDICS",
+        "doctor_id": "DOC-PANCHAKARMA-01",
+        "full_name": "Dr. Harpreet Kaur",
+        "medical_registration_number": "AYUSH-88120-PB",
+        "department_id": "PANCHAKARMA",
         "is_on_duty": True,
-        "duty_phone_encrypted": encrypt_phone("+919870000003"),
+        "duty_phone_encrypted": encrypt_phone("+919870000005"),
         "password_hash": hash_password("DoctorPass2026!"),
         "mfa_secret": "JBSWY3DPEHPK3PXP",
-        "sso_subject_id": "sso-doc-verma-003",
+        "sso_subject_id": "sso-doc-kaur-005",
+        "is_active": True
+    },
+    {
+        "doctor_id": "DOC-DERMA-01",
+        "full_name": "Dr. Neha Gupta",
+        "medical_registration_number": "MCI-77301-DL",
+        "department_id": "DERMATOLOGY",
+        "is_on_duty": True,
+        "duty_phone_encrypted": encrypt_phone("+919870000006"),
+        "password_hash": hash_password("DoctorPass2026!"),
+        "mfa_secret": "JBSWY3DPEHPK3PXP",
+        "sso_subject_id": "sso-doc-gupta-006",
+        "is_active": True
+    },
+    {
+        "doctor_id": "DOC-EMERGENCY-01",
+        "full_name": "Dr. Siddharth Rao",
+        "medical_registration_number": "MCI-33419-DL",
+        "department_id": "EMERGENCY",
+        "is_on_duty": True,
+        "duty_phone_encrypted": encrypt_phone("+919870000007"),
+        "password_hash": hash_password("DoctorPass2026!"),
+        "mfa_secret": "JBSWY3DPEHPK3PXP",
+        "sso_subject_id": "sso-doc-rao-007",
         "is_active": True
     }
 ]

@@ -53,19 +53,28 @@ async def doctor_login(req: DoctorLoginRequest, db: AsyncSession = Depends(get_d
     """
     Direct physician login for OPD Cabin console.
     """
+    # Comprehensive Fallback Catalog
+    DEMO_ROSTER = {
+        "DOC-GENMED-01": {"full_name": "Dr. Priya Sen", "dept": "GEN_MED", "dept_name": "General Medicine OPD", "room": "Room 101 (Ground Floor)"},
+        "DOC-CARDIO-01": {"full_name": "Dr. Vikram Malhotra", "dept": "CARDIOLOGY", "dept_name": "Cardiology OPD", "room": "Room 104 (1st Floor)"},
+        "DOC-ORTHO-01": {"full_name": "Dr. Rajesh Verma", "dept": "ORTHOPEDICS", "dept_name": "Orthopedics OPD", "room": "Room 108 (Ground Floor)"},
+        "DOC-AYUSH-01": {"full_name": "Dr. Ananya Sharma", "dept": "KAYACHIKITSA", "dept_name": "Kayachikitsa (Ayurveda OPD)", "room": "Room A-101"},
+        "DOC-PANCHAKARMA-01": {"full_name": "Dr. Harpreet Kaur", "dept": "PANCHAKARMA", "dept_name": "Panchakarma Department", "room": "Room A-102"},
+        "DOC-DERMA-01": {"full_name": "Dr. Neha Gupta", "dept": "DERMATOLOGY", "dept_name": "Dermatology OPD", "room": "Room 205 (2nd Floor)"},
+        "DOC-EMERGENCY-01": {"full_name": "Dr. Siddharth Rao", "dept": "EMERGENCY", "dept_name": "Emergency & Trauma Triage", "room": "Red Zone / Room E-01"}
+    }
+
     doc = (await db.execute(select(doctors).where(doctors.c.doctor_id == req.doctor_id))).fetchone()
     if not doc:
-        # Check if demo doctor
-        if req.doctor_id in ["DOC-AYUSH-01", "DOC-CARDIO-01", "DOC-ORTHO-01"]:
-            dept = "KAYACHIKITSA" if "AYUSH" in req.doctor_id else ("CARDIOLOGY" if "CARDIO" in req.doctor_id else "ORTHOPEDICS")
-            name = "Dr. Ananya Sharma" if "AYUSH" in req.doctor_id else "Dr. Vikram Malhotra"
-            room = "Room A-101" if "AYUSH" in req.doctor_id else "Room 104"
+        if req.doctor_id in DEMO_ROSTER:
+            info = DEMO_ROSTER[req.doctor_id]
             return {
                 "doctor_id": req.doctor_id,
-                "full_name": name,
-                "department_id": dept,
-                "department_name": dept,
-                "assigned_room": room,
+                "full_name": info["full_name"],
+                "department_id": info["dept"],
+                "department_name": info["dept_name"],
+                "assigned_room": info["room"],
+                "floor_room": info["room"],
                 "is_on_duty": True
             }
         raise HTTPException(status_code=404, detail="Doctor ID not registered")
@@ -80,6 +89,7 @@ async def doctor_login(req: DoctorLoginRequest, db: AsyncSession = Depends(get_d
         "department_id": doc.department_id,
         "department_name": dept_name,
         "assigned_room": room,
+        "floor_room": room,
         "is_on_duty": doc.is_on_duty
     }
 

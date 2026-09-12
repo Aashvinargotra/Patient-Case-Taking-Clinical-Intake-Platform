@@ -122,9 +122,11 @@ class AllopathicDialogueEngine:
 
 class AyushDialogueEngine:
     """
-    AYUSH / Ayurveda Dashavidha Pariksha State Machine (Full 11-Step Traversal).
-    Captures: Prakriti, Vikriti, Sara, Samhanana, Pramana, Satmya, Sattva,
-    Ahara Shakti, Vyayama Shakti, Vaya, and Ahara-Vihara / Agni.
+    AYUSH / Ayurveda Prashna & Dashavidha Pariksha State Machine (Full 11-Step Traversal).
+    Translates classical Ayurvedic assessment into practical clinical interrogation:
+    Prakriti, Vikriti (Doshic Imbalance), Sara (Vitality), Samhanana (Build),
+    Pramana, Satmya (Adaptation), Sattva (Mental Resilience), Ahara Shakti (Appetite & Digestion),
+    Vyayama Shakti, Vaya, and Ahara-Vihara & Agni-Koshtha.
     """
     STEPS = [
         "PRAKRITI",
@@ -143,106 +145,106 @@ class AyushDialogueEngine:
 
     PROMPTS = {
         "PRAKRITI": {
-            "hi": "आपकी स्वाभाविक शारीरिक प्रकृति क्या है? (वात - चंचल/हल्की, पित्त - उष्ण/तेज, कफ - शांत/दृढ़)",
-            "en": "What is your primary innate constitution (Prakriti)? (Vata - dynamic/light, Pitta - sharp/warm, Kapha - calm/sturdy)",
-            "pa": "ਤੁਹਾਡੀ ਕੁਦਰਤੀ ਪ੍ਰਕ੍ਰਿਤੀ (Prakriti) ਕੀ ਹੈ?"
+            "hi": "शारीरिक प्रवृत्ति (प्रकृति): आपकी स्वाभाविक शारीरिक प्रकृति और त्वचा कैसी है? (वात: रूखी त्वचा व ठंड लगना, पित्त: गर्मी अधिक लगना व पसीना, कफ: भारीपन व तैलीय त्वचा)",
+            "en": "Innate Constitution (Prakriti): What is your natural physical tendency? (Vata: dry skin, cold sensitivity; Pitta: heat sensitivity, quick hunger; Kapha: calm, oily skin, heaviness)",
+            "pa": "ਤੁਹਾਡੀ ਕੁਦਰਤੀ ਸਰੀਰਕ ਪ੍ਰਕ੍ਰਿਤੀ (Prakriti) ਕੀ ਹੈ?"
         },
         "VIKRITI": {
-            "hi": "वर्तमान में किस दोष का असंतुलन या विकृति महसूस हो रही है?",
-            "en": "Which Doshic morbidity or imbalance (Vikriti) are you currently experiencing?",
+            "hi": "दोष असंतुलन (विकृति): वर्तमान में आपकी बीमारी में किस दोष का मुख्य प्रभाव महसूस हो रहा है? (वात: तीव्र दर्द, जकड़न व वायु; पित्त: सीने में जलन, एसिडिटी व गर्माहट; कफ: बलगम, सुस्ती व भारीपन)",
+            "en": "Current Imbalance (Vikriti): What is the main character of your discomfort? (Vata: sharp pain, joint stiffness, gas; Pitta: burning, acidity, feverishness; Kapha: heaviness, mucus, sluggishness)",
             "pa": "ਮੌਜੂਦਾ ਸਮੇਂ ਕਿਹੜਾ ਦੋਸ਼ ਅਸੰਤੁਲਿਤ ਲੱਗ ਰਿਹਾ ਹੈ?"
         },
         "SARA": {
-            "hi": "आपकी धातु सारता (टिश्यू उत्तमता: रस, रक्त, मांस, मेद, अस्थि, मज्जा, शुक्र) का स्तर कैसा है?",
-            "en": "How would you rate your tissue essence/vitality (Sara: Rasa, Rakta, Mamsa, Meda, Asthi, Majja, Shukra)?",
-            "pa": "ਤੁਹਾਡੀ ਧਾਤੂ ਸਾਰਤਾ ਕਿਵੇਂ ਹੈ?"
+            "hi": "धातु सारता (शारीरिक बल): आपकी शारीरिक ऊर्जा, मांसपेशियों की दृढ़ता और स्फूर्ति कैसी रहती है?",
+            "en": "Tissue Vitality (Sara): How would you describe your overall physical stamina, muscle tone, and vital energy?",
+            "pa": "ਤੁਹਾਡੀ ਧਾਤੂ ਸਾਰਤਾ ਅਤੇ ਊਰਜਾ ਕਿਵੇਂ ਹੈ?"
         },
         "SAMHANANA": {
-            "hi": "शरीर की संहनन (शरीर का गठन/कॉम्पैक्टनेस) कैसी है?",
-            "en": "What is your body compactness and musculoskeletal build (Samhanana)?",
+            "hi": "शरीर गठन (संहनन): आपके शरीर का ढांचा और संहनन कैसा है? (सुगठित व मजबूत, सामान्य मध्यम, या कृश व कमजोर)",
+            "en": "Body Compactness (Samhanana): What is your musculoskeletal compactness? (Compact & well-built, moderate, or lean & fragile)",
             "pa": "ਸਰੀਰਕ ਗਠਨ (Samhanana) ਕਿਵੇਂ ਹੈ?"
         },
         "PRAMANA": {
-            "hi": "शारीरिक प्रमाण (ऊंचाई और वजन का अनुपात) कैसा है?",
-            "en": "What is your anthropometric proportion (Pramana: Height-to-Weight balance)?",
+            "hi": "शारीरिक प्रमाण (ऊंचाई और वजन): क्या आपका वजन आपकी ऊंचाई के अनुसार संतुलित है या अधिक/कम है?",
+            "en": "Physical Proportions (Pramana): Is your height-to-weight proportion balanced, overweight, or underweight?",
             "pa": "ਕੱਦ ਅਤੇ ਭਾਰ ਦਾ ਸੰਤੁਲਨ ਕਿਵੇਂ ਹੈ?"
         },
         "SATMYA": {
-            "hi": "आपकी सात्म्यता (खान-पान और मौसम के प्रति अनुकूलन क्षमता) कैसी है?",
-            "en": "What is your dietary and environmental habituation adaptability (Satmya)?",
-            "pa": "ਖਾਣ-ਪੀਣ ਦੀ ਅਨੁਕੂਲਤਾ (Satmya) ਕਿਵੇਂ ਹੈ?"
+            "hi": "सात्म्यता (अनुकूलन): क्या बदलते मौसम या खान-पान में बदलाव से आपको तुरंत सर्दी, एलर्जी या पेट की तकलीफ़ हो जाती है?",
+            "en": "Adaptability (Satmya): How easily do you adapt to weather changes, seasonal shifts, and varying diets without falling ill?",
+            "pa": "ਖਾਣ-ਪੀਣ ਅਤੇ ਮੌਸਮ ਦੀ ਅਨੁਕੂਲਤਾ (Satmya) ਕਿਵੇਂ ਹੈ?"
         },
         "SATTVA": {
-            "hi": "आपकी मानसिक शक्ति और तनाव सहने की क्षमता (सत्व) कैसी है?",
-            "en": "What is your mental resilience and psychological strength (Sattva: Pravara/Madhyama/Avara)?",
+            "hi": "मानसिक बल (सत्व): आपकी मानसिक सहनशक्ति और तनाव सहने की क्षमता कैसी है? (धैर्यवान, मध्यम, या जल्दी चिंतित/उद्विग्न)",
+            "en": "Mental Resilience (Sattva): How is your psychological strength and stress tolerance? (Calm & resilient, moderate, or easily anxious/irritable)",
             "pa": "ਮਾਨਸਿਕ ਸ਼ਕਤੀ (Sattva) ਕਿਵੇਂ ਹੈ?"
         },
         "AHARA_SHAKTI": {
-            "hi": "आपकी आहार शक्ति (भूख/अभ्यवहरण शक्ति और पाचन/जरण शक्ति) कैसी है?",
-            "en": "How is your digestive intake capacity (Abhyavaharana) and digestive power (Jarana Shakti)?",
+            "hi": "आहार शक्ति (भूख व पाचन): भोजन के प्रति आपकी रुचि और भोजन पचने की गति कैसी है?",
+            "en": "Digestive Intake Capacity (Ahara Shakti): How is your appetite intake capacity and ease of digestion after regular meals?",
             "pa": "ਭੁੱਖ ਅਤੇ ਹਜ਼ਮ ਕਰਨ ਦੀ ਸ਼ਕਤੀ (Ahara Shakti) ਕਿਵੇਂ ਹੈ?"
         },
         "VYAYAMA_SHAKTI": {
-            "hi": "आपकी व्यायाम शक्ति (शारीरिक परिश्रम और सहनशक्ति) कैसी है?",
-            "en": "What is your physical endurance and capacity for exertion (Vyayama Shakti)?",
+            "hi": "व्यायाम शक्ति (परिश्रम क्षमता): सीढ़ियां चढ़ने या तेज़ चलने पर आपकी सांस फूलने या थकने की क्या स्थिति है?",
+            "en": "Physical Exertion Capacity (Vyayama Shakti): What is your endurance when climbing stairs or engaging in physical labor?",
             "pa": "ਕਸਰਤ ਅਤੇ ਮਿਹਨਤ ਦੀ ਸਮਰੱਥਾ ਕਿਵੇਂ ਹੈ?"
         },
         "VAYA": {
-            "hi": "आप किस आयु वर्ग में आते हैं? (बाल्यावस्था, मध्यमावस्था, वृद्धावस्था)",
-            "en": "What is your age stage (Vaya: Balya <16, Madhyama 16-60, Vriddha >60)?",
+            "hi": "आयु वर्ग (वय): आप किस आयु वर्ग में आते हैं? (बाल्यावस्था, मध्यमावस्था, वृद्धावस्था)",
+            "en": "Age Stage (Vaya): Which age demographic represents you? (Balya <16, Madhyama 16-60, Vriddha >60)?",
             "pa": "ਤੁਹਾਡੀ ਉਮਰ ਵਰਗ (Vaya) ਕੀ ਹੈ?"
         },
         "AHARA_VIHARA_AND_AGNI": {
-            "hi": "आपकी जठराग्नि (समागिन/विषमाग्नि/तीक्ष्णाग्नि/मंदाग्नि), निद्रा और मल-मूत्र विसर्जन की स्थिति कैसी है?",
-            "en": "How is your digestive fire (Agni: Sama/Visham/Teekshna/Manda), sleep pattern, and bowel habits?",
+            "hi": "जठराग्नि व कोष्ठ (पाचन, नींद व पेट की स्थिति): क्या आपको खट्टी डकारें, गैस, कब्ज या अनिद्रा की शिकायत रहती है?",
+            "en": "Agni, Koshtha & Nidra: Do you experience acid reflux, bloating, hard/irregular stools, or poor sleep quality?",
             "pa": "ਤੁਹਾਡੀ ਅਗਨੀ (Agni), ਨੀਂਦ ਅਤੇ ਪੇਟ ਸਾਫ਼ ਹੋਣ ਦੀ ਸਥਿਤੀ ਕਿਵੇਂ ਹੈ?"
         },
         "REVIEW_AND_CONFIRM": {
-            "hi": "धन्यवाद! दशविध परीक्षा और आहार-विहार का विवरण सुरक्षित कर लिया गया है।",
-            "en": "Thank you! The complete Dashavidha Pariksha assessment is recorded.",
+            "hi": "धन्यवाद! आयुर्वेदिक रोग एवं दशविध परीक्षा का पूर्ण विवरण दर्ज कर लिया गया है।",
+            "en": "Thank you! The complete clinical Ayurvedic Prashna & Dashavidha Pariksha is recorded.",
             "pa": "ਧੰਨਵਾਦ! ਦਸ਼ਵਿਧ ਪ੍ਰੀਖਿਆ ਦਾ ਵੇਰਵਾ ਦਰਜ ਕਰ ਲਿਆ ਗਿਆ ਹੈ।"
         }
     }
 
     OPTIONS = {
         "PRAKRITI": [
-            {"label": "वातज (Vataja)", "value": "vata"},
-            {"label": "पित्तज (Pittaja)", "value": "pitta"},
-            {"label": "कफज (Kaphaja)", "value": "kapha"},
-            {"label": "द्विदोषज (Vata-Pitta / Pitta-Kapha)", "value": "dvidohaja"},
-            {"label": "समदोषज (Tridoshic)", "value": "samadosha"}
+            {"label": "वातज (रूखी त्वचा, ठंड लगना, चंचल गति / Vata)", "value": "vata"},
+            {"label": "पित्तज (अधिक गर्मी, लालिमा, तीक्ष्ण भूख / Pitta)", "value": "pitta"},
+            {"label": "कफज (तैलीय त्वचा, शांत मन, भारीपन / Kapha)", "value": "kapha"},
+            {"label": "द्विदोषज (वात-पित्त / कफ-वात / Dual Dosha)", "value": "dvidohaja"},
+            {"label": "समदोषज (संतुलित त्रिदोष / Tridoshic)", "value": "samadosha"}
         ],
         "VIKRITI": [
-            {"label": "वात प्रकोप (Vata Aggravation: Joint pain, dryness)", "value": "vata_vikriti"},
-            {"label": "पित्त प्रकोप (Pitta Aggravation: Burning, acidity, fever)", "value": "pitta_vikriti"},
-            {"label": "कफ प्रकोप (Kapha Aggravation: Heaviness, congestion)", "value": "kapha_vikriti"},
-            {"label": "सान्निपातिक (Complex Tridoshic)", "value": "sannipatika"}
+            {"label": "वात प्रकोप (जोड़ों में दर्द, जकड़न, सूखापन व गैस)", "value": "vata_vikriti"},
+            {"label": "पित्त प्रकोप (सीने में जलन, एसिडिटी, पित्त व गर्माहट)", "value": "pitta_vikriti"},
+            {"label": "कफ प्रकोप (भारीपन, बलगम, आलस्य व सुस्ती)", "value": "kapha_vikriti"},
+            {"label": "आमवात / त्रिदोषज (सूजन, तीव्र जकड़न व भारीपन)", "value": "sannipatika"}
         ],
         "SARA": [
-            {"label": "प्रवर सार (High tissue vitality)", "value": "pravara"},
-            {"label": "मध्यम सार (Moderate tissue vitality)", "value": "madhyama"},
-            {"label": "अवर सार (Low tissue vitality)", "value": "avara"}
+            {"label": "प्रवर सार (उत्तम शारीरिक स्फूर्ति व बल / High Vitality)", "value": "pravara"},
+            {"label": "मध्यम सार (सामान्य ऊर्जा / Moderate Vitality)", "value": "madhyama"},
+            {"label": "अवर सार (थकान, कमजोरी व शिथिलता / Low Vitality)", "value": "avara"}
         ],
         "SAMHANANA": [
-            {"label": "सुसंहत (Compact & Well-built)", "value": "su_samhanana"},
-            {"label": "मध्यम (Moderate build)", "value": "madhyama"},
-            {"label": "हीन (Poor / Fragile build)", "value": "heena"}
+            {"label": "सुसंहत (सुगठित व संतुलित शरीर / Well-built)", "value": "su_samhanana"},
+            {"label": "मध्यम (सामान्य गठन / Moderate build)", "value": "madhyama"},
+            {"label": "हीन (कमजोर व पतला गठन / Lean & fragile)", "value": "heena"}
         ],
         "SATTVA": [
-            {"label": "प्रवर सत्व (High mental resilience)", "value": "pravara_sattva"},
-            {"label": "मध्यम सत्व (Moderate mental resilience)", "value": "madhyama_sattva"},
-            {"label": "अवर सत्व (Low mental resilience)", "value": "avara_sattva"}
+            {"label": "प्रवर सत्व (धैर्यवान व तनाव सहने में सक्षम / High Resilience)", "value": "pravara_sattva"},
+            {"label": "मध्यम सत्व (सामान्य मनोबल / Moderate)", "value": "madhyama_sattva"},
+            {"label": "अवर सत्व (जल्दी घबराने वाला / Low Resilience)", "value": "avara_sattva"}
         ],
         "AHARA_SHAKTI": [
-            {"label": "उत्तम भूख और पाचन / Excellent Intake & Digestion", "value": "pravara_ahara"},
-            {"label": "मध्यम भूख / Moderate Digestion", "value": "madhyama_ahara"},
-            {"label": "अवर भूख / Poor Appetite & Digestion", "value": "avara_ahara"}
+            {"label": "उत्तम भूख और समय पर पाचन / Excellent Digestion", "value": "pravara_ahara"},
+            {"label": "मध्यम भूख (हल्का भोजन सुपाच्य) / Moderate Digestion", "value": "madhyama_ahara"},
+            {"label": "मंद भूख (भूख न लगना व भारीपन) / Sluggish Digestion", "value": "avara_ahara"}
         ],
         "AHARA_VIHARA_AND_AGNI": [
-            {"label": "समागिन (Balanced Agni)", "value": "sama_agni"},
-            {"label": "विषमाग्नि (Irregular Digestion / Bloating)", "value": "vishama_agni"},
-            {"label": "तीक्ष्णाग्नि (Hyperactive / Acidic Agni)", "value": "teekshna_agni"},
-            {"label": "मंदाग्नि (Sluggish Digestion / Heaviness)", "value": "manda_agni"}
+            {"label": "समागिन (संतुलित पाचन व प्रतिदिन सामान्य पेट साफ़)", "value": "sama_agni"},
+            {"label": "विषमाग्नि व क्रूर कोष्ठ (अनियमित भूख, गैस, पेट फूलना व कब्ज)", "value": "vishama_agni"},
+            {"label": "तीक्ष्णाग्नि व मृदु कोष्ठ (अति-भूख, सीने में जलन व दस्त की प्रवृत्ति)", "value": "teekshna_agni"},
+            {"label": "मंदाग्नि व साम अवस्था (भूख न लगना, पेट भारी व चिकना मल)", "value": "manda_agni"}
         ]
     }
 

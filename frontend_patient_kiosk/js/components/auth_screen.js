@@ -5,6 +5,7 @@ import { CONFIG, getTranslation } from "../config.js";
 import { kioskState } from "../state.js";
 import { audioController } from "../audio_controller.js";
 import { renderAbhaAuthModal } from "./abha_auth_modal.js";
+import { renderPhoneAuthModal } from "./phone_auth_modal.js";
 import { apiService } from "../api_service.js";
 
 export function renderAuthScreen(container, onAuthSuccess) {
@@ -105,7 +106,7 @@ export function renderAuthScreen(container, onAuthSuccess) {
     });
 
     container.querySelector("#card-auth-phone").addEventListener("click", () => {
-        renderAbhaAuthModal(container, (patient) => {
+        renderPhoneAuthModal(container, (patient) => {
             if (onAuthSuccess) onAuthSuccess(patient);
         });
     });

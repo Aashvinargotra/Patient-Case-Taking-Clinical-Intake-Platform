@@ -15,13 +15,26 @@ class PortalApiClient {
         } catch (e) {
             console.warn("[PortalApi.doctorLogin] Local login fallback:", e);
         }
+
+        const ROSTER = {
+            "DOC-GENMED-01": { name: "Dr. Priya Sen", dept: "GEN_MED", deptName: "General Medicine OPD", room: "Room 101 (Ground Floor)" },
+            "DOC-CARDIO-01": { name: "Dr. Vikram Malhotra", dept: "CARDIOLOGY", deptName: "Cardiology OPD", room: "Room 104 (1st Floor)" },
+            "DOC-ORTHO-01": { name: "Dr. Rajesh Verma", dept: "ORTHOPEDICS", deptName: "Orthopedics OPD", room: "Room 108 (Ground Floor)" },
+            "DOC-DERMA-01": { name: "Dr. Neha Gupta", dept: "DERMATOLOGY", deptName: "Dermatology OPD", room: "Room 205 (2nd Floor)" },
+            "DOC-EMERGENCY-01": { name: "Dr. Siddharth Rao", dept: "EMERGENCY", deptName: "Emergency & Trauma Triage", room: "Red Zone / Room E-01" },
+            "DOC-AYUSH-01": { name: "Dr. Ananya Sharma", dept: "KAYACHIKITSA", deptName: "Kayachikitsa (Ayurveda OPD)", room: "Room A-101" },
+            "DOC-PANCHAKARMA-01": { name: "Dr. Harpreet Kaur", dept: "PANCHAKARMA", deptName: "Panchakarma Department", room: "Room A-102" }
+        };
+
+        const doc = ROSTER[doctorId] || ROSTER["DOC-GENMED-01"];
         return {
             doctor_id: doctorId,
-            full_name: "Dr. Ananya Sharma",
-            department_id: "KAYACHIKITSA",
-            department_name: "Kayachikitsa (Ayurveda OPD)",
-            floor_room: "Room A-101 (Ground Floor)",
-            medical_registration_number: "AYUSH-99214-ND",
+            full_name: doc.name,
+            department_id: doc.dept,
+            department_name: doc.deptName,
+            assigned_room: doc.room,
+            floor_room: doc.room,
+            medical_registration_number: `REG-${doctorId.slice(-6)}`,
             is_on_duty: true
         };
     }
